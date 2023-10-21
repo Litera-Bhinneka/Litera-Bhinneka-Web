@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Review Page</h1>
+
+    <a href="{% url 'review:add_review' %}">
+        <button>
+            Add Review
+        </button>
+    </a>
+
+    <br><br>
+
+    <a href="{% url 'homepage:show_homepage' %}">
+        <button>
+            back
+        </button>
+    </a>
+
+    <table>
+        <tr>
+            <th>No</th>
+            <th>Book Title</th>
+            <th>Reviewer Name</th>
+            <th>Rating</th>
+            <th>Summary</th>
+            <th>Review Text</th>
+            <th>Review Date</th>
+        </tr>
+    
+        {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
+    
+        {% for review in reviews %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td>{{review.book_title}}</td>
+                <td>{{review.reviewer_name}}</td>
+                <td>{{review.review_score}}</td>
+                <td>{{review.review_summary}}</td>
+                <td>{{review.review_text}}</td>
+                <td>{{review.review_date}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <br />
+    
+{% endblock content %}
