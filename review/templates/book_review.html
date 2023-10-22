@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Review Page</h1>
+
+    <a href="{% url 'review:add_review' %}">
+        <button>
+            Add Review
+        </button>
+    </a>
+
+    <br><br>
+
+    <a href="{% url 'catalog:show_catalog' %}">
+        <button>
+            back
+        </button>
+    </a>
+
+    <!-- Display book details outside the table -->
+    <h1>{{ book.title }}</h1>
+    <p><strong>Author:</strong> {{ book.author }}</p>
+    <p><strong>Category:</strong> {{ book.category }}</p>
+    <p><strong>Rating:</strong> {{ book.rating }}</p>
+    <!-- Add more book details as needed -->
+
+    <!-- Display reviews in a table -->
+    <table>
+        <tr>
+            <th>No</th>
+            <th>Reviewer Name</th>
+            <th>Review Summary</th>
+            <th>Review Text</th>
+            <th>Review Date</th>
+        </tr>
+
+        {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
+
+        {% for review in reviews %} <!-- Access reviews associated with the book -->
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ review.reviewer_name }}</td>
+                <td>{{ review.review_summary }}</td>
+                <td>{{ review.review_text }}</td>
+                <td>{{ review.review_date }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <br />
+    
+{% endblock content %}
