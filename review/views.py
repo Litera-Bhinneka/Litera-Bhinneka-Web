@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from review.models import Review
+from catalog.models import Book
 from django.http import HttpResponseRedirect
 from review.forms import ReviewForm
 from django.urls import reverse
@@ -12,6 +13,18 @@ def show_review(request):
     }
 
     return render(request, "show_review.html", context)
+
+
+def see_book_review(request, id):
+    book = get_object_or_404(Book, pk=id)
+    reviews = Review.objects.filter(book_title=book.title)
+
+    context = {
+        'book': book,
+        'reviews': reviews,
+    }
+
+    return render(request, "book_review.html", context)
 
 
 def add_review(request):
