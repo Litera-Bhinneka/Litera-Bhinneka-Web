@@ -1,20 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <nav class="bg-custom-navy text-white py-3 px-4 flex justify-between items-center shadow-xl">
-        <a href="{% url 'homepage:show_homepage' %}" class="text-2xl font-bold ml-2 text-while hover:text-gray-350">
-            <h1 class="text-2xl font-bold">LITERA</h1>
-        </a>
-        <div class="mx-6 flex items-center gap-8">
-            <span class="text-lg">Hi, <strong>{{ name }}</strong></span>
-            <a href="{% url 'authentication:logout' %}">
-                <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
-                    Logout
-                </button>
-            </a>
-        </div>
-    </nav>
-
     <div class="m-4">
         <a href="{% url 'homepage:show_homepage' %}" class="text-white bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded-full">
             Back
