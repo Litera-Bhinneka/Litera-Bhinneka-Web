@@ -22,6 +22,7 @@ def see_book_review(request, id):
     context = {
         'book': book,
         'reviews': reviews,
+        'name': request.user.username,
     }
 
     return render(request, "book_review.html", context)
