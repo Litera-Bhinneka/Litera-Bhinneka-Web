@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Recommendation
+from catalog.models import Book
 from django.http import HttpResponseRedirect
 from .forms import RecommendationForm
 from django.urls import reverse
@@ -9,6 +10,7 @@ def show_recommendation(request):
     recommendations = Recommendation.objects.all().values()
     context = {
         'recommendations': recommendations,
+        'name': request.user.username
     }
     return render(request, 'show_recommendation.html', context)
 

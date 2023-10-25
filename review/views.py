@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from review.models import Review
 from catalog.models import Book
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from review.forms import ReviewForm
 from django.urls import reverse
+from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 def show_review(request):
@@ -23,6 +25,7 @@ def see_book_review(request, id):
         'book': book,
         'reviews': reviews,
         'name': request.user.username,
+        'stars': (1,2,3,4,5)
     }
 
     return render(request, "book_review.html", context)
@@ -39,3 +42,29 @@ def add_review(request):
 
     context = {'form': form, 'name':request.user.username}
     return render(request, "add_review.html", context)
+
+
+def get_review_json(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    review_item = Review.objects.filter(book_title=book.title)
+    return HttpResponse(serializers.serialize('json', review_item))
+
+
+@csrf_exempt
+def add_review_ajax(request, book_id):
+    if request.method == 'POST':
+        rating = request.POST.get("rating")
+        review_text = request.POST.get("review_text")
+        reviewer_name = request.user.username
+        book_title = get_object_or_404(Book, pk=book_id).title
+
+        new_review = Review(book_title=book_title,
+                             reviewer_name=reviewer_name, 
+                             review_score=rating,
+                             review_summary="",
+                             review_text=review_text)
+        new_review.save()
+
+        return HttpResponse(b"CREATED", status=201)
+
+    return HttpResponseNotFound()
