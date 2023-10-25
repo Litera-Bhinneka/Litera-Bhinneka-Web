@@ -37,5 +37,5 @@ def add_review(request):
         review.save()
         return HttpResponseRedirect(reverse('review:show_review'))
 
-    context = {'form': form}
+    context = {'form': form, 'name':request.user.username}
     return render(request, "add_review.html", context)
