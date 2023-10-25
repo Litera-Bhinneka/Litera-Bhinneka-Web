@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Recommendation Lists</h1>
+<table>
+    <tr>
+        <th>If you like this</th>
+        <th>Maybe you like this</th>
+        <th>Scale</th>
+        <th>Description</th>
+        <th>Recommended by</th>
+        <th>Date Added</th>
+    </tr>
+
+    {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
+
+    {% for rec in recommendations %}
+        <tr>
+            <td>{{rec.book_title}}</td>
+            <td>{{rec.another_book_title}}</td>
+            <td>{{rec.recommendation_scale}}</td>
+            <td>{{rec.description}}</td>
+            <td>{{rec.recommender_name}}</td>
+            <td>{{rec.recommendation_date}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+<br />
+
+<a href="{% url 'recommendation:add_recommendation' %}">
+    <button>
+        Add New Product
+    </button>
+</a>
+
+<a href="{% url 'homepage:show_homepage' %}">
+    <button>
+        Back
+    </button>
+</a>
+{% endblock content %}

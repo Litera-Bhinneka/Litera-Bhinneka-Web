@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Catalog</h1>
+
+    <br><br>
+
+    <a href="{% url 'homepage:show_homepage' %}">
+        <button>
+            back
+        </button>
+    </a>
+
+    <table>
+        <tr>
+            <th>No</th>
+            <th>Book Cover</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Year Published</th>
+        </tr>
+    
+        {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
+    
+        {% for book in books %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td>
+                    <a href="{% url 'review:book_review' id=book.id %}"> <!-- Link to book details page -->
+                        <img src="{{ book.image_link }}" alt="book cover">
+                    </a>
+                </td>
+                <td>{{book.title}}</td>
+                <td>{{book.author}}</td>
+                <td>{{book.description}}</td>
+                <td>{{book.category}}</td>
+                <td>{{book.year_of_published}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <br />
+    
+{% endblock content %}
