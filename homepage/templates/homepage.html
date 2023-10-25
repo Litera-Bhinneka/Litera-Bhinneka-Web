@@ -2,60 +2,60 @@
 
 {% block content %}
 
-    <h1>Litera</h1>
+  <nav class="bg-custom-navy text-white py-3 px-4 flex justify-between items-center shadow-xl">
+    <a href="{% url 'homepage:show_homepage' %}" class="text-2xl font-bold ml-2 text-while hover:text-gray-350">
+        <h1 class="text-2xl font-bold">LITERA</h1>
+    </a>
+    <div class="mx-6 flex items-center gap-8">
+        <span class="text-lg">Hi, <strong>{{ name }}</strong></span>
+        <a href="{% url 'authentication:logout' %}">
+            <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
+                Logout
+            </button>
+        </a>
+    </div>
+  </nav>
 
-    <h5>Name:</h5>
-    <p>{{name}}</p>
+  <br>
+  <br>
 
-    <h5>Class:</h5>
-    <p>{{class}}</p>
-
-<a href="{% url 'authentication:logout' %}">
+  <a href=" ../catalog/show-catalog ">
     <button>
-        Logout
+        See Catalog
     </button>
-</a>
+  </a>
 
-<br>
-<br>
+  <br>
+  <br>
 
-<a href=" ../review/show-review ">
-  <button>
-      See Review
-  </button>
-</a>
+  <a href=" ../recommendation/show-recommendation ">
+    <button>
+        See Recommendation
+    </button>
+  </a>
 
-<br>
-<br>
+  <div id="post-form" class= " flex justify-center mt-24 mb-10 ">
+      <div class="w-4/5 grid grid-cols-1 text-center shadow-md  rounded-lg bg-gradient-to-b from-sky-200 to-sky-300 md:w-2/5 p-5 ">
+        <p class="text-gray-700" >
+          Have something to share about Litera?  
+        </p>
+        <p class="text-gray-700 mb-5">
+          Drop your feedback below!
+        </p>
+        <form id="question-form" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-6 mb-2">
+          {% csrf_token %}
+          <fieldset>
+            <div class="grid grid-cols-1">            
+              {{ form }}
+            </div>
+            <button id="submit-btn" type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full mt-5">Submit</button>
+          </fieldset>
+        </form>
+          <span class="block text-sm text-gray-600 sm:text-center dark:text-gray-500" >Last feedback submission:</span>
+          <!-- <span id="last-submit-question" class="block text-sm text-gray-600 sm:text-center dark:text-gray-500" >{{ last_feedback }}</span> -->
+        </div>
+    </div>
 
-<a href=" ../catalog/show-catalog ">
-  <button>
-      See Catalog
-  </button>
-</a>
+  <h5>Sesi terakhir login: {{ last_login }}</h5>
 
-<div id="post-form" class= " flex justify-center mt-24 mb-10 ">
-    <div class="w-4/5 grid grid-cols-1 text-center shadow-md  rounded-lg bg-gradient-to-b from-sky-200 to-sky-300 md:w-2/5 p-5 ">
-      <p class="text-gray-700" >
-        Have something to share about Litera?  
-      </p>
-      <p class="text-gray-700 mb-5">
-        Drop your feedback below!
-      </p>
-      <form id="question-form" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-6 mb-2">
-        {% csrf_token %}
-        <fieldset>
-          <div class="grid grid-cols-1">            
-            {{ form }}
-          </div>
-          <button id="submit-btn" type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full mt-5">Submit</button>
-        </fieldset>
-      </form>
-        <span class="block text-sm text-gray-600 sm:text-center dark:text-gray-500" >Last feedback submission:</span>
-        <!-- <span id="last-submit-question" class="block text-sm text-gray-600 sm:text-center dark:text-gray-500" >{{ last_feedback }}</span> -->
-      </div>
-  </div>
-
-<h5>Sesi terakhir login: {{ last_login }}</h5>
-
-{% endblock content %}
+  {% endblock content %}
