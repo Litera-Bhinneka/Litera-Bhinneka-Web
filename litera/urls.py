@@ -24,4 +24,7 @@ urlpatterns = [
     path('review/', include('review.urls')),
     path('catalog/', include('catalog.urls')),
     path('recommendation/', include('recommendation.urls')),
+    path('exchange/', include('exchange.urls')),
+    path('manage-user/', include('manage_user.urls')),
+
 ]
