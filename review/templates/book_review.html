@@ -2,6 +2,7 @@
 
 
 {% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
     <link rel="stylesheet" href="styles.css">
     <style>
         .star-widget label{
@@ -25,36 +26,49 @@
         #card_review{
             background-color: #dddddd;
         }
+        .custom-button {
+            color: White;
+            background-image: linear-gradient(to bottom right, #68D391, #4299E1);
+            transition: background-image 0.3s, box-shadow 0.3s;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            font-family: "Dosis", bold;
+            padding: 0.625rem 1.25rem;
+            text-align: center;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            margin-left: 0px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .custom-button:hover {
+            background-image: linear-gradient(to bottom left, #8E24AA, #4299E1);
+            box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.1);
+        }
+
+        .custom-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.2);
+        }
+        #total_rating {
+        font-size: 48px;
+        color: #fd4;
+        display: inline-block;
+        overflow: hidden;
+        }
+        #total_rating::before { 
+        content: "★★★★★" 
+        }
     </style>
-   
 
     <div class="m-4">
-        <div>
-            <a href="{% url 'catalog:show_catalog' %}" class="text-white bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded-full">
-                Back
-            </a>
-        </div>
 
         <!-- Display book image and its detail in columns -->
-        <div class="flex justify-between p-8">
-            <div id="book_image" class="w-1/3 flex justify-center items-center rounded-lg overflow-hidden shadow-xl">
-                <img class="max-w-full h-auto object-cover" style="max-height: 192px;" src="{{ book.image_link }}" alt="book cover">
-            </div>
-            <div class="m-4 w-2/3 p-4">
-                <h1 class="text-2xl font-bold mb-4">{{book.title}}</h1>
-                <div class="mb-4">
-                    <p class="text-gray-700">by <b>{{book.author}}</b></p>
-                </div>
-                <div class="my-4 border-t border-solid border-gray-600 border-t-4 border-opacity-75 mx-0 w-full"></div>
-                <div class="mb-4">
-                    <p class="text-gray-700">{{book.description}}</p>
-                </div>
-                <div class="mb-4">
-                    <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" class="block text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-                        Add Review
-                    </button>
-                </div>
-            </div>
+        <div id="book_container" class="flex justify-between p-8">
+    
         </div>
 
         <!-- Display reviews in a table -->
@@ -114,6 +128,53 @@
         async function getReviews() {
             return fetch("{% url 'review:get_review_json' book_id=book.id %}").then((res) => res.json())
         }
+        async function getBook(){
+            return fetch("{% url 'review:get_book_json' book_id=book.id %}").then((res) => res.json())
+        }
+        async function showBook() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const container = document.getElementById("book_container");
+            container.innerHTML = "";  // Clear the current content.
+            
+            const book = await getBook();
+            const reviews = await getReviews();
+            let avgRating = 0;
+
+            reviews.forEach((review) => {
+                avgRating += review.fields.review_score;
+            });
+
+            if (reviews.length > 0) {
+                avgRating = avgRating / reviews.length;
+            }
+            
+            let htmlString = '';
+
+            htmlString += `
+                <div id="book_image" class="w-1/3 flex justify-center items-center rounded-lg overflow-hidden shadow-xl">
+                    <img class="max-w-full h-auto object-cover" style="max-height: 192px;" src="${book[0].fields.image_link}" alt="book cover">
+                </div>
+                <div class="m-4 w-2/3 p-4">
+                    <h1 class="text-2xl font-bold mb-4">${book[0].fields.title}</h1>
+                    <div class="mb-4">
+                        <p class="text-gray-700">by <b>${book[0].fields.author}</b></p>
+                    </div>
+                    <div class="my-4 border-t border-solid border-gray-600 border-t-4 border-opacity-75 mx-0 w-full"></div>
+                    <div class="mb-4">
+                        <p class="text-gray-700">${book[0].fields.description}</p>
+                    </div>
+                    <div id="total_rating" class="mb-4 rating"></div>
+                    <div class="mb-4">
+                        <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" class="custom-button" type="button">
+                            Add Review
+                        </button>
+                    </div>
+                </div>`;
+            
+
+            container.innerHTML = htmlString;
+        }
+
         async function refreshReviews() {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             const container = document.getElementById("review_container");
@@ -172,10 +233,13 @@
                 modal.classList.remove("hidden")
             }
         }
+        var cw = window.rating1.clientWidth; // save original 100% pixel width
+        function rating( stars ) {
 
-        
-
-    refreshReviews()
+            window.total_rating.style.width = Math.round(cw * (stars / 5)) + 'px';
+        }
+        showBook()
+        refreshReviews()
     </script>
     
 {% endblock content %}
