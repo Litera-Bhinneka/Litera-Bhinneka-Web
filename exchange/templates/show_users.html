@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="m-4">
+    <a href="{% url 'homepage:show_homepage' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Back
+    </a>
+    
+    <div class="flex flex-wrap justify-center">
+        {% for user in users %}
+        <div class="max-w-sm m-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
+            <img class="w-full h-48 object-cover" src="/docs/images/people/profile-picture-1.jpg" alt="User Image">
+            <div class="p-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark-text-gray-200">{{user.username}}</h2>
+                <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover-bg-blue-600 focus-ring-2 focus-ring-blue-400 focus-outline-none" onclick="openModal(this.getAttribute('data-username'))" data-username="{{user.username}}">
+                    See Inventory
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% for user in users %}
+    <div id="inventoryModal-{{ user.username }}" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
+            <div class="modal-content py-4 text-left px-6">
+                <div class="flex justify-between items-center pb-3">
+                    <p class="text-2xl font-bold">{{ user.username }}'s Inventory</p>
+                    <button class="modal-close" onclick="closeModal(this.getAttribute('data-username'))" data-username="{{user.username}}">
+                        <span class="text-2xl">&times;</span>
+                    </button>
+                </div>
+                <div id="books-{{ user.username }}">
+                    <!-- Books will be displayed here -->
+                    <ul>
+                        {% for item in inventory_data %}
+                            <li>{{item.book.title}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <a href="{% url 'exchange:offer_user' username=user.username %}" class="bg-blue-500 hover-bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Send Offer
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+
+    async function openModal(username) {
+        document.getElementById(`inventoryModal-${username}`).classList.remove('hidden');
+        // const books = await getBooks(username);
+        // const container = document.getElementById(`books-${username}`);
+        // container.innerHTML = '';
+
+        // books.forEach((book, index, array) => {
+        //     const book_display = document.createElement('li');
+        //     book_display.textContent = 'Title: ' + book.fields.title;
+        //     container.appendChild(book_display);
+        // });
+    }
+
+    function closeModal(username) {
+        document.getElementById(`inventoryModal-${username}`).classList.add('hidden');
+    }
+</script>
+{% endblock content %}

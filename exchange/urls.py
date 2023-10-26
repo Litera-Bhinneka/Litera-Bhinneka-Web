@@ -1,9 +1,10 @@
 from django.urls import path
-# from recommendation.views import show_recommendation, add_recommendation
+from exchange.views import show_users, offer_user, get_books
 
 app_name = 'exchange'
 
 urlpatterns = [
-    # path('show-recommendation/', show_recommendation, name='show_recommendation'),
-    # path('add-recommendation/', add_recommendation, name='add_recommendation'),
+    path('', show_users, name='show_users'),
+    path('offer-user/<str:username>/', offer_user, name='offer_user'),
+    path('get-books/<str:username>/', get_books, name='get_books'),
 ]
