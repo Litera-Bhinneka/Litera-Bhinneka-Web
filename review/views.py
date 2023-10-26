@@ -19,7 +19,7 @@ def show_review(request):
 
 def see_book_review(request, id):
     book = get_object_or_404(Book, pk=id)
-    reviews = Review.objects.filter(book_title=book.title)
+    reviews = Review.objects.filter(book_title=book.title).order_by('-review_date')
 
     context = {
         'book': book,
@@ -46,17 +46,19 @@ def add_review(request):
 
 def get_review_json(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    review_item = Review.objects.filter(book_title=book.title)
+    review_item = Review.objects.filter(book_title=book.title).order_by('-review_date')
     return HttpResponse(serializers.serialize('json', review_item))
 
 
 @csrf_exempt
-def add_review_ajax(request, book_id):
+def add_review_ajax(request, book_id1, book_id2):
     if request.method == 'POST':
-        rating = request.POST.get("rating")
+        print(request.POST)
+        print(request.POST.get("rating"))
         review_text = request.POST.get("review_text")
         reviewer_name = request.user.username
-        book_title = get_object_or_404(Book, pk=book_id).title
+        rating = int(request.POST.get("rating"))
+        book_title = get_object_or_404(Book, pk=book_id2).title
 
         new_review = Review(book_title=book_title,
                              reviewer_name=reviewer_name, 
@@ -66,5 +68,6 @@ def add_review_ajax(request, book_id):
         new_review.save()
 
         return HttpResponse(b"CREATED", status=201)
+    print(request.method)
 
     return HttpResponseNotFound()
