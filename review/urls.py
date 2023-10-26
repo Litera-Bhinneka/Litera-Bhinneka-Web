@@ -9,6 +9,8 @@ urlpatterns = [
   path('book-review/<int:id>/', see_book_review, name='book_review'),
   path('get-review-json/<int:book_id>/', get_review_json, name='get_review_json'),
   path('add-review-ajax/<int:book_id>/', add_review_ajax, name='add_review_ajax'),
+  path('book-review/<int:book_id1>/add-review-ajax/<int:book_id2>/', add_review_ajax, name='add_review_ajax'),
+
 #   path('login/', login_user, name='login'), 
 #   path('logout/', logout_user, name='logout'),
 ]
