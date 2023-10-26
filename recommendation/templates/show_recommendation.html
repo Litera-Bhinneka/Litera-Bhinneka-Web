@@ -2,16 +2,15 @@
 {% block meta%}
 <title>Recommendation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
+<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
 <style>
-    body {
-        background-color: #bcc6d4;
-    }
     #judul {
         margin-top: 100px;
         margin-bottom: 100px;
         font-family: 'Dosis', sans-serif;
         font-size: 100px;
     }
+
     .card-container {
         width: 100%;
         padding: 4px;
@@ -55,12 +54,14 @@
         color: #718096;
         font-size: 0.875rem;
     }
+
     .custom-button {
         color: White;
         background-image: linear-gradient(to bottom right, #68D391, #4299E1);
         transition: background-image 0.3s, box-shadow 0.3s;
-        border-radius: 0.375rem;
+        border-radius: 9999px;
         font-size: 0.875rem;
+        font-weight: bold;
         font-family: "Dosis", bold;
         padding: 0.625rem 1.25rem;
         text-align: center;
@@ -89,102 +90,62 @@
 {% endblock meta%}
 {% block content %}
 <div class="text-center" id="judul">
-    <strong>Recommendation List</strong>
+    <strong>User Recommendations</strong>
 </div>
-<button type="button" class="custom-button">Write Recommendation</button>
-<!-- <div class="flex flex-wrap">
-    {% for rec in recommendations %}
-    <div class="w-full p-4">
-        <a href="#" class="flex flex-col bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-            <div class="flex flex-col justify-between p-4 leading-normal">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ rec.recommender_name }}</h5>
-                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">If you like this:</p>
-                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ rec.book_title }}</p>
-            </div>
-        </a>
-    </div>
-    {% endfor %}
-</div> -->
-<!-- <div class="flex flex-wrap">
-    {% for rec in recommendations %}
-    <div class="w-full p-4">
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-            <div class="px-6 py-4">
-                <div class="font-bold text-xl mb-2">{{ rec.recommender_name }}</div>
-                <div class="flex items-center mb-2">
-                    <p class="text-gray-700 text-base">{{ rec.recommender_name }} recommends {{ rec.another_book_title }} </p>
-                </div>
-                <div>
-                    <p class="text-gray-700 text-base">if you like {{ rec.book_title }}</p>
-                </div>
-                <div>
-                    <p class="text-gray-700 text-base">{{ rec.description}} </p>
-                </div>
-            </div>
-            <div class="px-6 py-4">
-                <span class="text-gray-600 text-sm">{{ rec.recommendation_date }}</span>
+<div class="mb-4">
+    <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="custom-button" type="button">
+        Write Recommendation
+    </button>
+</div> 
+<!-- Main modal -->
+<div id="authentication-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal">
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="px-6 py-6 lg:px-8">
+                <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Write your recommendation!</h3>
+                <form class="space-y-6" action="#">
+                    <div>
+                        <label for="owned_book" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choose your book that you want to recommend</label>
+                        <select id="owned_book" class="owned_book bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        </select>
+                    </div>
+                    <div class="flex justify-center">
+                        <img src="" id="book-image" alt="book image">
+                    </div>
+                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" style="font-family: 'Dosis', sans-serif; font-weight: bold;">Next</button>
+                </form>
             </div>
         </div>
     </div>
-    {% endfor %}
-</div> -->
+</div> 
+
 <div class="flex flex-wrap card-container" id="card-container">
-    <!-- {% for rec in recommendations %}
-        <div class="w-full p-4">
-            <div class="card">
-                <div class="card-content">
-                    <div class="card-title">{{ rec.recommender_name }}</div>
-                    <div class="card-text">
-                        <p>{{ rec.recommender_name }} recommends {{ rec.another_book_title }}</p>
-                    </div>
-                    <div class="card-text">
-                        <p>if you like {{ rec.book_title }}</p>
-                    </div>
-                    <div class="card-desc">
-                        <p>{{ rec.description }}</p>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <span class="card-date">{{ rec.recommendation_date }}</span>
-                </div>
-            </div>
-        </div>
-    {% endfor %} -->
 </div>
 
-<!-- <div class="flex flex-wrap">
-    {% for rec in recommendations %}
-    <div class="w-full p-3">
-        <a href="#" class="flex flex-col bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
-            <div class="flex flex-col justify-between p-4 leading-normal">
-                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ rec.recommender_name }}</h5>
-                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">If you like this:</p>
-            </div>
-            <div class="flex flex-col justify-between p-4 leading-normal">
-                <p class="mb-2 font-normal text-gray-700 dark:text-gray-400 text-right">{{ rec.book_title }}</p>
-            </div>
-        </a>
-    </div>
-    {% endfor %}
-</div> -->
-
-<br />
-
-<a href="{% url 'recommendation:add_recommendation' %}">
-    <button>
-        Add New Recommendation
-    </button>
-</a>
 <br>
-<a href="{% url 'homepage:show_homepage' %}">
-    <button>
-        Back
-    </button>
-</a>
 
 <script>
     async function getRecommendations() {
         return fetch("{% url 'recommendation:get_recommendation_json' %}").then((res) => res.json())
+    }
+    async function getUserBooks(){
+        const response = await fetch("{% url 'recommendation:get_user_inventory_json' %}")
+        const data = await response.json();
+        const bookTitles = data.book_titles;
+        return bookTitles
+    }
+    async function getBookImages(){
+        const response = await fetch("{% url 'recommendation:get_book_image' %}")
+        const data = await response.json();
+        const bookImages = data.book_images;
+        return bookImages
     }
     async function refreshRecommendations() {
         document.getElementById("card-container").innerHTML = ""
@@ -220,15 +181,50 @@
             document.getElementById("card-container").appendChild(card)
         })
     }
-    // function addRecommendation() {
-    //     fetch("{% url 'recommendation:add_recommendation_ajax' %}", {
-    //         method: "POST",
-    //         body: new FormData(document.querySelector('#form'))
-    //     }).then(refreshProducts)
+    async function refreshInventory(){
+        const books_title = await getUserBooks()
+        const book_image = await getBookImages()
+        const selectedElement = document.getElementById("owned_book");
+        console.log(book_image)
+        if (Array.isArray(books_title) && books_title.length > 0) {
+            books_title.forEach((title, idx) => {
+            const option = document.createElement("option");
+            option.value = title;
+            option.text = title;
+            selectedElement.appendChild(option);
+            if (idx === 0) {
+                document.getElementById("book-image").setAttribute("src", book_image[0]);
+            }
+        });
+        } else {
+            const option = document.createElement("option");
+            option.text = "You don't have any book yet";
+            selectedElement.appendChild(option);
+            selectedElement.disabled = true;
+            document.getElementById("book-image").style.display = "none";
+        }
+    }
+    $(document).ready(function() {
+    $("select.owned_book").change(async function() {
+        const bookImages = await getBookImages();
+        
+        let selectedIndex = $(this).prop("selectedIndex");
+        let newImageSource = bookImages[selectedIndex];
+        
+        console.log(newImageSource);
+        $("#book-image").attr("src", newImageSource);
+        });
+    });
+    function addRecommendation() {
+        fetch("{% url 'recommendation:add_recommendation_ajax' %}", {
+            method: "POST",
+            body: new FormData(document.querySelector('#form'))
+        }).then(refreshRecommendations)
 
-    //     document.getElementById("form").reset()
-    //     return false
-    // }
+        document.getElementById("form").reset()
+        return false
+    }
+    refreshInventory()
     refreshRecommendations()
 </script>
 {% endblock content %}
