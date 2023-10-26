@@ -35,6 +35,7 @@ def get_book_json(request):
 
 @csrf_exempt
 def increment_book_ajax(request, book_id):
+    print(request.method)
     book = Book.objects.get(pk=book_id)
     user = request.user
 
