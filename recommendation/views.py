@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from .models import Recommendation
 from catalog.models import Book
-from django.http import HttpResponse, HttpResponseRedirect
+from manage_user.models import Inventory
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .forms import RecommendationForm
 from django.core import serializers
 from django.urls import reverse
@@ -29,25 +30,36 @@ def add_recommendation(request):
     context = {'form': form}
     return render(request, "add_recommendation.html", context)
 
-# @csrf_exempt
-# def add_product_ajax(request):
-#     if request.method == 'POST':
-#         name = request.POST.get("name")
-#         price = request.POST.get("price")
-#         description = request.POST.get("description")
-#         user = request.user
+@csrf_exempt
+def add_recommendation_ajax(request):
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        price = request.POST.get("price")
+        description = request.POST.get("description")
+        user = request.user
 
-#         new_product = Recommendation(name=name, price=price, description=description, user=user)
-#         new_product.save()
+        new_product = Recommendation(name=name, price=price, description=description, user=user)
+        new_product.save()
 
-#         return HttpResponse(b"CREATED", status=201)
+        return HttpResponse(b"CREATED", status=201)
 
-#     return HttpResponseNotFound()
+    return HttpResponseNotFound()
 
-def find_book_id(request, book_name):
-    book = get_object_or_404(Book, title=book_name)
+def get_user_inventory_json(request):
+    user = request.user
+    inventory = Inventory.objects.filter(user=user)
+    book_title = []
+    for i in inventory:
+        book_title.append(i.book.title)
+    return JsonResponse({'book_titles': book_title})
 
-    return redirect('review:book_review', id=book.id)
+def get_book_image(request):
+    user = request.user
+    inventory = Inventory.objects.filter(user=user)
+    book_image = []
+    for i in inventory:
+        book_image.append(i.book.image_link)
+    return JsonResponse({'book_images': book_image})
 
 def get_recommendation_json(request):
     rec = Recommendation.objects.all()
