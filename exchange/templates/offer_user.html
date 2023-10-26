@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form name="offer" method="POST">
+    {% csrf_token %}
+    <h2>{{ user1.user.username }}'s Inventory</h2>
+    <ul>
+        {% for item in user1.inventory_items %}
+        <li>
+            <label for="id_user1_item_quantities_{{ forloop.counter0 }}">{{ item.book.title }}</label>
+            <a href="{% url 'review:book_review' id=item.book.id %}"> <!-- Link to book details page -->
+                <img src="{{ item.book.image_link }}" alt="book cover">
+            </a>
+            <select name="user1_item_quantities" id="id_user1_item_quantities_{{ forloop.counter0 }}" max_amount="{{ item.amount }}">
+            </select>
+        </li>
+        <script>
+                var select = $("#id_user1_item_quantities_{{ forloop.counter0 }}");
+                var amount = parseInt(select.attr("max_amount"));
+                console.log(amount);
+
+                for (var i = 0; i <= amount; i++) {
+                    var option = $("<option></option>");
+                    option.attr("value", i);
+                    option.text(i);
+                    select.append(option);
+                }
+        </script>
+        {% endfor %}
+    </ul>
+    <br>
+    
+    <h2>Your Inventory</h2>
+    <ul>
+        {% for item in user2.inventory_items %}
+        <li>
+            <label for="id_user2_item_quantities_{{ forloop.counter0 }}">{{ item.book.title }}</label>
+            <select name="user2_item_quantities" id="id_user2_item_quantities_{{ forloop.counter0 }}" max_amount="{{ item.amount }}">
+            </select>
+        </li>
+        <script>
+                var select = $("#id_user2_item_quantities_{{ forloop.counter0 }}");
+                var amount = parseInt(select.attr("max_amount"));
+                console.log(amount);
+
+                for (var i = 0; i <= amount; i++) {
+                    var option = $("<option></option>");
+                    option.attr("value", i);
+                    option.text(i);
+                    select.append(option);
+                }
+        </script>
+        {% endfor %}
+    </ul>
+    <br>
+    <input type="submit" value="Send Offer">
+</form>
+
+{% endblock content %}
