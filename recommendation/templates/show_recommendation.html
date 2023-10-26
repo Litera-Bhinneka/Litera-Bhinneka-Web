@@ -220,6 +220,15 @@
             document.getElementById("card-container").appendChild(card)
         })
     }
+    // function addRecommendation() {
+    //     fetch("{% url 'recommendation:add_recommendation_ajax' %}", {
+    //         method: "POST",
+    //         body: new FormData(document.querySelector('#form'))
+    //     }).then(refreshProducts)
+
+    //     document.getElementById("form").reset()
+    //     return false
+    // }
     refreshRecommendations()
 </script>
 {% endblock content %}
