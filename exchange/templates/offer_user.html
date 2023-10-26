@@ -1,59 +1,69 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form name="offer" method="POST">
-    {% csrf_token %}
-    <h2>{{ user1.user.username }}'s Inventory</h2>
-    <ul>
-        {% for item in user1.inventory_items %}
-        <li>
-            <label for="id_user1_item_quantities_{{ forloop.counter0 }}">{{ item.book.title }}</label>
-            <a href="{% url 'review:book_review' id=item.book.id %}"> <!-- Link to book details page -->
-                <img src="{{ item.book.image_link }}" alt="book cover">
-            </a>
-            <select name="user1_item_quantities" id="id_user1_item_quantities_{{ forloop.counter0 }}" max_amount="{{ item.amount }}">
-            </select>
-        </li>
-        <script>
-                var select = $("#id_user1_item_quantities_{{ forloop.counter0 }}");
-                var amount = parseInt(select.attr("max_amount"));
-                console.log(amount);
+<div class="p-4"> <!-- Add padding -->
+    <form name="offer" method="POST" class="bg-white p-4 rounded-lg shadow-md">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <h2 class="text-xl font-bold mb-4">{{ user1.user.username }}'s Inventory</h2>
+                <ul>
+                    {% for item in user1.inventory_items %}
+                    <li class="mb-4">
+                        <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+                            <label for="id_user1_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
+                            <a href="{% url 'review:book_review' id=item.book.id %}" class="block">
+                                <img src="{{ item.book.image_link }}" alt="book cover" class="w-32 h-48 object-cover mb-2 rounded-lg">
+                            </a>
+                            <select name="user1_item_quantities" id="id_user1_item_quantities_{{ forloop.counter0 }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
+                            </select>
+                        </div>
+                        <script>
+                            var select = $("#id_user1_item_quantities_{{ forloop.counter0 }}");
+                            var amount = parseInt(select.attr("max_amount"));
 
-                for (var i = 0; i <= amount; i++) {
-                    var option = $("<option></option>");
-                    option.attr("value", i);
-                    option.text(i);
-                    select.append(option);
-                }
-        </script>
-        {% endfor %}
-    </ul>
-    <br>
-    
-    <h2>Your Inventory</h2>
-    <ul>
-        {% for item in user2.inventory_items %}
-        <li>
-            <label for="id_user2_item_quantities_{{ forloop.counter0 }}">{{ item.book.title }}</label>
-            <select name="user2_item_quantities" id="id_user2_item_quantities_{{ forloop.counter0 }}" max_amount="{{ item.amount }}">
-            </select>
-        </li>
-        <script>
-                var select = $("#id_user2_item_quantities_{{ forloop.counter0 }}");
-                var amount = parseInt(select.attr("max_amount"));
-                console.log(amount);
+                            for (var i = 0; i <= amount; i++) { // Start from 1
+                                var option = $("<option></option>");
+                                option.attr("value", i);
+                                option.text(i);
+                                select.append(option);
+                            }
+                        </script>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div>
+                <h2 class="text-xl font-bold mb-4">Your Inventory</h2>
+                <ul>
+                    {% for item in user2.inventory_items %}
+                    <li class="mb-4">
+                        <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+                            <label for="id_user2_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
+                            <a href="{% url 'review:book_review' id=item.book.id %}" class="block">
+                                <img src="{{ item.book.image_link }}" alt="book cover" class="w-32 h-48 object-cover mb-2 rounded-lg">
+                            </a>
+                            <select name="user2_item_quantities" id="id_user2_item_quantities_{{ forloop.counter0 }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
+                            </select>
+                        </div>
+                        <script>
+                            var select = $("#id_user2_item_quantities_{{ forloop.counter0 }}");
+                            var amount = parseInt(select.attr("max_amount"));
 
-                for (var i = 0; i <= amount; i++) {
-                    var option = $("<option></option>");
-                    option.attr("value", i);
-                    option.text(i);
-                    select.append(option);
-                }
-        </script>
-        {% endfor %}
-    </ul>
-    <br>
-    <input type="submit" value="Send Offer">
-</form>
-
+                            for (var i = 0; i <= amount; i++) { // Start from 1
+                                var option = $("<option></option>");
+                                option.attr("value", i);
+                                option.text(i);
+                                select.append(option);
+                            }
+                        </script>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <input type="submit" value="Send Offer" class="bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700">
+    </form>
+</div>
 {% endblock content %}
