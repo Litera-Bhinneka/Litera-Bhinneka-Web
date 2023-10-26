@@ -1,42 +1,225 @@
 {% extends 'base.html' %}
+{% block meta%}
+<title>Recommendation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
+<style>
+    body {
+        background-color: #bcc6d4;
+    }
+    #judul {
+        margin-top: 100px;
+        margin-bottom: 100px;
+        font-family: 'Dosis', sans-serif;
+        font-size: 100px;
+    }
+    .card-container {
+        width: 100%;
+        padding: 4px;
+    }
 
+    .card {
+        background-color: #dddddd;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: 0.375rem;
+        overflow: hidden;
+    }
+
+    .card-content {
+        margin-top: 15px;
+        margin-left: 15px;
+        margin-bottom: 5px;
+    }
+
+    .card-footer{
+        padding: 12px;
+    }
+
+    .card-title {
+        font-weight: bold;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-text {
+        color: #4a5568;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-desc {
+        color: #4a5568;
+        font-size: 0.900rem;
+    }
+
+    .card-date {
+        color: #718096;
+        font-size: 0.875rem;
+    }
+    .custom-button {
+        color: White;
+        background-image: linear-gradient(to bottom right, #68D391, #4299E1);
+        transition: background-image 0.3s, box-shadow 0.3s;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        font-family: "Dosis", bold;
+        padding: 0.625rem 1.25rem;
+        text-align: center;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        margin-left: 20px;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .custom-button:hover {
+        background-image: linear-gradient(to bottom left, #8E24AA, #4299E1);
+        box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.1);
+    }
+
+    .custom-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.2);
+    }
+
+    .dark .custom-button:focus {
+        box-shadow: 0 0 0 4px rgba(45, 148, 72, 0.2);
+    }
+</style>
+{% endblock meta%}
 {% block content %}
-<h1>Recommendation Lists</h1>
-<table>
-    <tr>
-        <th>If you like this</th>
-        <th>Maybe you like this</th>
-        <th>Scale</th>
-        <th>Description</th>
-        <th>Recommended by</th>
-        <th>Date Added</th>
-    </tr>
-
-    {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
-
+<div class="text-center" id="judul">
+    <strong>Recommendation List</strong>
+</div>
+<button type="button" class="custom-button">Write Recommendation</button>
+<!-- <div class="flex flex-wrap">
     {% for rec in recommendations %}
-        <tr>
-            <td>{{rec.book_title}}</td>
-            <td>{{rec.another_book_title}}</td>
-            <td>{{rec.recommendation_scale}}</td>
-            <td>{{rec.description}}</td>
-            <td>{{rec.recommender_name}}</td>
-            <td>{{rec.recommendation_date}}</td>
-        </tr>
+    <div class="w-full p-4">
+        <a href="#" class="flex flex-col bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+            <div class="flex flex-col justify-between p-4 leading-normal">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ rec.recommender_name }}</h5>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">If you like this:</p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">{{ rec.book_title }}</p>
+            </div>
+        </a>
+    </div>
     {% endfor %}
-</table>
+</div> -->
+<!-- <div class="flex flex-wrap">
+    {% for rec in recommendations %}
+    <div class="w-full p-4">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-4">
+                <div class="font-bold text-xl mb-2">{{ rec.recommender_name }}</div>
+                <div class="flex items-center mb-2">
+                    <p class="text-gray-700 text-base">{{ rec.recommender_name }} recommends {{ rec.another_book_title }} </p>
+                </div>
+                <div>
+                    <p class="text-gray-700 text-base">if you like {{ rec.book_title }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-700 text-base">{{ rec.description}} </p>
+                </div>
+            </div>
+            <div class="px-6 py-4">
+                <span class="text-gray-600 text-sm">{{ rec.recommendation_date }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div> -->
+<div class="flex flex-wrap card-container" id="card-container">
+    <!-- {% for rec in recommendations %}
+        <div class="w-full p-4">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-title">{{ rec.recommender_name }}</div>
+                    <div class="card-text">
+                        <p>{{ rec.recommender_name }} recommends {{ rec.another_book_title }}</p>
+                    </div>
+                    <div class="card-text">
+                        <p>if you like {{ rec.book_title }}</p>
+                    </div>
+                    <div class="card-desc">
+                        <p>{{ rec.description }}</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="card-date">{{ rec.recommendation_date }}</span>
+                </div>
+            </div>
+        </div>
+    {% endfor %} -->
+</div>
+
+<!-- <div class="flex flex-wrap">
+    {% for rec in recommendations %}
+    <div class="w-full p-3">
+        <a href="#" class="flex flex-col bg-white border border-gray-200 rounded-lg shadow md:flex-row hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+            <div class="flex flex-col justify-between p-4 leading-normal">
+                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{{ rec.recommender_name }}</h5>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">If you like this:</p>
+            </div>
+            <div class="flex flex-col justify-between p-4 leading-normal">
+                <p class="mb-2 font-normal text-gray-700 dark:text-gray-400 text-right">{{ rec.book_title }}</p>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div> -->
 
 <br />
 
 <a href="{% url 'recommendation:add_recommendation' %}">
     <button>
-        Add New Product
+        Add New Recommendation
     </button>
 </a>
-
+<br>
 <a href="{% url 'homepage:show_homepage' %}">
     <button>
         Back
     </button>
 </a>
+
+<script>
+    async function getRecommendations() {
+        return fetch("{% url 'recommendation:get_recommendation_json' %}").then((res) => res.json())
+    }
+    async function refreshRecommendations() {
+        document.getElementById("card-container").innerHTML = ""
+        const recommendations = await getRecommendations()
+        recommendations.forEach((rec) => {
+            const card = document.createElement("div")
+            card.classList.add("w-full", "p-4")
+            const cardContainer = document.createElement("div")
+            cardContainer.classList.add("card")
+            const cardContent = document.createElement("div")
+            cardContent.classList.add("card-content")
+            const cardTitle = document.createElement("div")
+            cardTitle.classList.add("card-title")
+            cardTitle.innerHTML = `${rec.fields.recommender_name}`
+            const cardText = document.createElement("div")
+            cardText.classList.add("card-text")
+            cardText.innerHTML = `${rec.fields.recommender_name} recommends ${rec.fields.another_book_title}`
+            const cardDesc = document.createElement("div")
+            cardDesc.classList.add("card-desc")
+            cardDesc.innerHTML = `if you like ${rec.fields.book_title}`
+            const cardFooter = document.createElement("div")
+            cardFooter.classList.add("card-footer")
+            const cardDate = document.createElement("span")
+            cardDate.classList.add("card-date")
+            cardDate.innerHTML = rec.fields.recommendation_date
+            cardFooter.appendChild(cardDate)
+            cardContent.appendChild(cardTitle)
+            cardContent.appendChild(cardText)
+            cardContent.appendChild(cardDesc)
+            cardContainer.appendChild(cardContent)
+            cardContainer.appendChild(cardFooter)
+            card.appendChild(cardContainer)
+            document.getElementById("card-container").appendChild(card)
+        })
+    }
+    refreshRecommendations()
+</script>
 {% endblock content %}
