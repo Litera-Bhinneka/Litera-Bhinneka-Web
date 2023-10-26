@@ -1,39 +1,313 @@
 {% extends 'base.html' %}
-
 {% block content %}
-    <div class="m-4">
-        <a href="{% url 'homepage:show_homepage' %}" class="text-white bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded-full">
-            Back
-        </a>
 
-        <table>
-            <tr>
-                <th>No</th>
-                <th>Book Cover</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Category</th>
-                <th>Year Published</th>
-            </tr>
-        
-            {% comment %} Berikut cara memperlihatkan data produk di bawah baris ini {% endcomment %}
-        
-            {% for book in books %}
-                <tr>
-                    <td>{{forloop.counter}}</td>
-                    <td>
-                        <a href="{% url 'review:book_review' id=book.id %}"> <!-- Link to book details page -->
-                            <img src="{{ book.image_link }}" alt="book cover">
-                        </a>
-                    </td>
-                    <td>{{book.title}}</td>
-                    <td>{{book.author}}</td>
-                    <td>{{book.category}}</td>
-                    <td>{{book.year_of_published}}</td>
-                </tr>
-            {% endfor %}
-        </table>
+<html style="background-color: #bcc6d4">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabel Produk</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+        crossorigin="anonymous"
+    />
+    <style>
+      h1 {
+        text-align: center;
+        margin-top: 40px;
+      }
+
+      h2 {
+        margin-left: 20px;
+      }
+
+      h3 {
+        margin-left: 20px;
+      }
+
+      p {
+        margin-left: 20px;
+      }
+      #container {
+        align-items: center;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 95%;
+        margin-left: 32px;
+        margin-right: 5px;
+        align-items: center;
+      }
+
+      th,
+      td {
+        border: 2px solid black;
+        padding: 6px;
+        text-align: center;
+      }
+
+      td img {
+        max-width: 100px;
+      }
+
+      .ajax-button {
+        background-color: #024ebf;
+        border: 2px solid black;
+        cursor: pointer;
+        font-size: 16px;
+        width: 40%;
+        height: 30%;
+        color: white;
+        margin-left: 20px;
+        margin-top: 20px;
+      }
+
+      .add-product-button {
+        background-color: #024ebf;
+        border: 2px solid black;
+        cursor: pointer;
+        font-size: 16px;
+        color: white;
+        margin-left: 20px;
+      }
+
+      body {
+        background-color: #bcc6d4;
+        padding-top: 80px;
+        margin: 0;
+      }
+
+      h5 {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        margin-left: 20px;
+      }
+
+      span {
+        color: white;
+        font-size: 18px;
+        font-style: oblique;
+        font-weight: bold;
+      }
+
+      .product-card {
+        display: inline-block;
+        width: 350px; /* Mengatur lebar kartu agar tiga kartu dapat masuk dalam satu baris */
+        height: 200px;
+        margin: 2%; /* Menambahkan margin antara kartu */
+        border: 1px solid #ddd;
+        padding: 10px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        text-align: center;
+        background-color: #dddddd;
+        vertical-align: top;
+        border-radius: 10px; /* Mengatur sudut kartu menjadi melengkung */
     
+      }
+
+      .product-card .product-image img {
+        max-width: 100px;
+        max-height: 100px;
+      }
+
+
+      .product-details {
+        padding: 10px;
+      }
+
+      .product-details h3 {
+        margin: 0;
+      }
+
+      .product-details p {
+        margin: 5px 0;
+      }
+
+      .product-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+
+      .card {
+        width: 200px; /* 30% lebar layar */
+        height: 100%;
+        margin: 1%; /* Ruang antara kartu */
+        display: inline-block; /* Membuat kartu tampil secara horizontal */
+        align-items: center;
+        align-self: center;
+        display: grid;
+        margin: 10px 5px 10px 5px; 
+      }
+
+
+      .card-img-top{
+        width: 100%;
+        grid-row: 2; /* Menempatkan gambar di baris kedua (tengah) */
+        justify-self: center;
+      }
+
+      .card-body{
+        font-size: 13px;
+      }
+
+      .card-title{
+        font-size: 16px;
+      }
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999; /* Menentukan indeks z untuk menumpuk navbar di atas konten lainnya */
+        background-color: #222; /* Ganti dengan warna latar belakang yang sesuai */
+        padding: 5px 0;
+        }
+        
+    </style>
+  </head>
+  <body>
+<nav class="bg-custom-navy text-white py-1 px-2 flex justify-between items-center shadow-xl">
+  <a href="{% url 'homepage:show_homepage' %}" class="text-2xl font-bold ml-2 text-white hover:text-gray-350">
+    <h1 class="text-2xl font-bold">LITERA</h1>
+  </a>
+  <div class="mx-6 flex items-center gap-8">
+    <span class="text-lg">Hi, <strong>{{ name }}</strong></span>
+    <a href="{% url 'authentication:logout' %}">
+      <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
+        Logout
+      </button>
+    </a>
+  </div>
+</nav>
+
+<div class="m-4">
+  <a href="{% url 'homepage:show_homepage' %}" class="text-white bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded-full">
+    Back
+  </a>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Product by AJAX</button>
+  <table id="product_table"></table>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Product</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form" onsubmit="return false;">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="image_link" class="col-form-label">Book cover:</label>
+            <input type="text" class="form-control" id="image_link" name="image_link"></input>
+          </div>
+          <div class="mb-3">
+            <label for="title" class="col-form-label">Title:</label>
+            <input type="text" class="form-control" id="title" name="title"></input>  {# Perbaiki nama input menjadi 'title' #}
+          </div>
+          <div class="mb-3">
+            <label for="author" class="col-form-label">Author:</label>
+            <textarea class="form-control" id="author" name="author"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="category" class="col-form-label">Category:</label>
+            <textarea class="form-control" id="category" name="category"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="year_of_published" class="col-form-label">Year Published:</label>
+            <textarea class="form-control" id="year_of_published" name="year_of_published"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="col-form-label">Description:</label>
+            <textarea class="form-control" id="description" name="description"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger close-button" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
+      </div>
     </div>
-    
+  </div>
+</div>
+</body>
+</html>
+<script
+    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"
+></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"
+></script>
+<script>
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  async function getProducts() {
+    return fetch("{% url 'catalog:get_product_json' %}").then((res) => res.json());
+  }
+
+  async function refreshProducts() {
+    document.getElementById("product_table").innerHTML = "";
+
+    const products = await getProducts();
+
+    let htmlString = `
+      <div class="row">
+    `;
+
+    products.forEach((item, index) => {
+        console.log(item)
+      htmlString += `
+        <div class="col-3 mb-5">
+          <div class="card">
+            <a href="/review/book-review/${item.pk}">
+                <img src="${item.fields.image_link}" class="card-img-top" alt="book cover" />
+            </a>
+            <div class="card-body">
+              <h5 class="card-title">${item.fields.title}</h5>
+              <p class="card-text">${item.fields.author}</p>
+              <p class="card-text">${item.fields.category}</p>
+              <p class="card-text">${item.fields.year_of_published}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    htmlString += `
+      </div>
+    `;
+
+    document.getElementById("product_table").innerHTML = htmlString;
+  }
+
+  function addProduct() {
+    const form = new FormData()
+    form.append('image_link', document.querySelector('#image_link').value)
+    form.append('title', document.querySelector('#title').value)
+    form.append('author', document.querySelector('#author').value)
+    form.append('category', document.querySelector('#category').value)
+    form.append('year_of_published', document.querySelector('#year_of_published').value)
+    fetch("{% url 'catalog:add_product_ajax' %}", {
+        method: "POST",
+      headers: {
+        headers: {'X-CSRFToken': csrftoken},
+        mode: 'same-origin'
+      },
+      body: form
+    }).then(res => refreshProducts())
+
+    document.getElementById("form").reset();
+    return false;
+  }
+
+  document.getElementById("button_add").onclick = addProduct;
+  refreshProducts();
+</script>
+
 {% endblock content %}
