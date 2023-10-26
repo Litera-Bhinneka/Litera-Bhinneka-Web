@@ -90,7 +90,7 @@
 {% endblock meta%}
 {% block content %}
 <div class="text-center" id="judul">
-    <strong>User Recommendations</strong>
+    <strong class="text-2xl md:text-5xl lg:text-7xl xl:text-10xl">User Recommendations</strong>
 </div>
 <div class="mb-4">
     <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="custom-button" type="button">
@@ -112,19 +112,30 @@
                 <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Write your recommendation!</h3>
                 <form class="space-y-6" action="#">
                     <div>
-                        <label for="owned_book" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choose your book that you want to recommend</label>
+                        <label for="owned_book" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choose your book that you would like to make a recommendation for</label>
                         <select id="owned_book" class="owned_book bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         </select>
                     </div>
                     <div class="flex justify-center">
                         <img src="" id="book-image" alt="book image">
                     </div>
+                    <div>
+                        <label for="owned_book2" id="label_owned_book2" class="owned_book2 block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choose your book that is similar to </label>
+                        <select id="owned_book2" class="owned_book2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        </select>
+                    </div>
+                    <div class="flex justify-center">
+                        <img src="" id="book-image2" alt="book image">
+                    </div>
+                    <div></div>
+                        <label for="desciprion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                        <textarea name="description_text" id="description" rows="6" class="resize-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-800 focus:border-green-800 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="Why do you recommend the book" required></textarea>
                     <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" style="font-family: 'Dosis', sans-serif; font-weight: bold;">Next</button>
                 </form>
             </div>
         </div>
     </div>
-</div> 
+</div>
 
 <div class="flex flex-wrap card-container" id="card-container">
 </div>
@@ -181,12 +192,14 @@
             document.getElementById("card-container").appendChild(card)
         })
     }
+    let selectedBookTitleGlobal;
     async function refreshInventory(){
         const books_title = await getUserBooks()
         const book_image = await getBookImages()
         const selectedElement = document.getElementById("owned_book");
-        console.log(book_image)
-        if (Array.isArray(books_title) && books_title.length > 0) {
+        const selectedElement2 = document.getElementById("owned_book2");
+        let firstItem;
+        if (Array.isArray(books_title) && books_title.length > 1) {
             books_title.forEach((title, idx) => {
             const option = document.createElement("option");
             option.value = title;
@@ -194,25 +207,76 @@
             selectedElement.appendChild(option);
             if (idx === 0) {
                 document.getElementById("book-image").setAttribute("src", book_image[0]);
+                document.getElementById("label_owned_book2").textContent = "Choose a book similar to " + title;
+                firstItem = title;
+                selectedBookTitleGlobal = title;
+            } else if (idx == 1){
+                books_title.forEach((title2) => {
+                    if(title2 != firstItem){
+                        const option2 = document.createElement("option");
+                        option2.value = title2;
+                        option2.text = title2;
+                        selectedElement2.appendChild(option2);
+                    }
+                });
+                document.getElementById("book-image2").setAttribute("src", book_image[1]);
             }
         });
         } else {
             const option = document.createElement("option");
-            option.text = "You don't have any book yet";
+            const option2 = document.createElement("option");
+            option.text = "You must atleast has 2 books to recommend";
+            option2.text = "You must atleast has 2 books to recommend";
             selectedElement.appendChild(option);
+            selectedElement2.appendChild(option2);
             selectedElement.disabled = true;
+            selectedElement2.disabled = true;
             document.getElementById("book-image").style.display = "none";
+            document.getElementById("book-image2").style.display = "none";
+            document.getElementById("label_owned_book2").textContent = "Choose a book similar to your book";
         }
     }
     $(document).ready(function() {
     $("select.owned_book").change(async function() {
+        const bookTitles = await getUserBooks();
         const bookImages = await getBookImages();
         
         let selectedIndex = $(this).prop("selectedIndex");
         let newImageSource = bookImages[selectedIndex];
-        
-        console.log(newImageSource);
+        const selectedBookTitle = $(this).val();
+        selectedBookTitleGlobal = selectedBookTitle;
+
         $("#book-image").attr("src", newImageSource);
+        $("#label_owned_book2").text("Choose a book similar to " + selectedBookTitle);
+        $("#owned_book2").empty();
+        bookTitles.forEach(function(book) {
+            if (book != selectedBookTitleGlobal) {
+                const option = document.createElement("option");
+                option.value = book;
+                option.text = book;
+                document.getElementById("owned_book2").appendChild(option);
+            }
+        });
+        if(selectedIndex == 0){
+            document.getElementById("book-image2").setAttribute("src", bookImages[1]);
+        }else{
+            document.getElementById("book-image2").setAttribute("src", bookImages[0]);
+        }
+        });
+    });
+    $(document).ready(function() {
+    $("select.owned_book2").change(async function() {
+        const bookTitles = await getUserBooks();
+        const bookImages = await getBookImages();
+
+        bookImages.splice(bookTitles.indexOf(selectedBookTitleGlobal), 1);
+        
+        let selectedIndex = $(this).prop("selectedIndex");
+        console.log(selectedIndex)
+        let newImageSource = bookImages[selectedIndex];
+        const selectedBookTitle = $(this).val();
+        console.log(selectedBookTitle);
+        $("#book-image2").attr("src", newImageSource);
         });
     });
     function addRecommendation() {
