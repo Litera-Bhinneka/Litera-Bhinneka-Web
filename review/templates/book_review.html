@@ -2,6 +2,7 @@
 
 
 {% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
     <link rel="stylesheet" href="styles.css">
     <style>
         .star-widget label{
@@ -25,19 +26,76 @@
         #card_review{
             background-color: #dddddd;
         }
+        .custom-button {
+            color: White;
+            background-image: linear-gradient(to bottom right, #68D391, #4299E1);
+            transition: background-image 0.3s, box-shadow 0.3s;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            font-family: "Dosis", bold;
+            padding: 0.625rem 1.25rem;
+            text-align: center;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            margin-left: 0px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .custom-button:hover {
+            background-image: linear-gradient(to bottom left, #8E24AA, #4299E1);
+            box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.1);
+        }
+
+        .custom-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.2);
+        }
+        #total_rating {
+        font-size: 32px;
+        color: #fd4;
+        display: inline-block;
+        overflow: hidden;
+        }
+        #total_rating::before { 
+        content: "★★★★★" 
+        }
+        .star-ratings {
+            unicode-bidi: bidi-override;
+            color: #b6b4b4;
+            font-size: 32px;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            .fill-ratings {
+                color: #fd4;
+                padding: 0;
+                position: absolute;
+                z-index: 1;
+                display: block;
+                top: 0;
+                left: 0;
+                overflow: hidden;
+                
+                span {
+                display: inline-block;
+                }
+            }
+            .empty-ratings {
+                padding: 0;
+                display: block;
+                z-index: 0;
+            }
+            }
     </style>
-   
 
     <div class="m-4">
-        <div>
-            <a href="{% url 'catalog:show_catalog' %}" class="text-white bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded-full">
-                Back
-            </a>
-        </div>
 
         <!-- Display book image and its detail in columns -->
-        <div class="flex justify-between p-8">
-            <div id="book_image" class="w-1/3 flex justify-center items-center rounded-lg overflow-hidden shadow-xl">
+        <div id="book_container" class="flex justify-between p-8">
+            <!-- <div id="book_image" class="w-1/3 flex justify-center items-center rounded-lg overflow-hidden shadow-xl">
                 <img class="max-w-full h-auto object-cover" style="max-height: 192px;" src="{{ book.image_link }}" alt="book cover">
             </div>
             <div class="m-4 w-2/3 p-4">
@@ -49,16 +107,18 @@
                 <div class="mb-4">
                     <p class="text-gray-700">{{book.description}}</p>
                 </div>
+                <div id="total_rating" class="mb-4 rating"></div>
                 <div class="mb-4">
-                    <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" class="block text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                    <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" class="custom-button" type="button">
                         Add Review
                     </button>
                 </div>
-            </div>
+            </div> -->
+    
         </div>
 
         <!-- Display reviews in a table -->
-        <div id="review_container" class="flex flex-wrap">
+        <div id="review_container" class="mx-12 flex flex-wrap">
 
         </div>
         
@@ -66,7 +126,7 @@
         <div id="add-review-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center hidden w-full h-full p-4 overflow-x-hidden overflow-y-auto bg-gray-900 bg-opacity-50">
             <div class="relative w-full max-w-md bg-white rounded-lg shadow-lg dark:bg-gray-700">
                 <!-- Modal content -->
-                <button id="close-modal-button" type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="add-review-modal">
+                <button id="close-modal-button" onclick="closeModal()" type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="add-review-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
@@ -114,6 +174,72 @@
         async function getReviews() {
             return fetch("{% url 'review:get_review_json' book_id=book.id %}").then((res) => res.json())
         }
+        async function getBook(){
+            return fetch("{% url 'review:get_book_json' book_id=book.id %}").then((res) => res.json())
+        }
+        async function showBook() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const container = document.getElementById("book_container");
+            container.innerHTML = "";  // Clear the current content.
+            
+            const book = await getBook();
+            const reviews = await getReviews();
+            let messageRating = "rating"
+            let avgRating = 0;
+
+            reviews.forEach((review) => {
+                avgRating += review.fields.review_score;
+            });
+
+            if (reviews.length > 0) {
+                avgRating = avgRating / reviews.length;
+                if (reviews.length > 1) {
+                    messageRating = "ratings";
+                }
+            }
+            
+            let htmlString = '';
+
+            htmlString += `
+            <div id="book_image" class="m-4 w-1/3 flex justify-center items-center rounded-lg overflow-hidden shadow-xl">
+                <img class="w-full h-auto object-cover" style="max-height: 600px; max-width: 550px;" src="${book[0].fields.image_link}" alt="book cover">
+            </div>
+                <div class="m-4 w-2/3 p-4">
+                    <h1 class="text-2xl font-bold mb-4">${book[0].fields.title}</h1>
+                    <div class="mb-4">
+                        <p class="text-gray-700">by <b>${book[0].fields.author}</b></p>
+                    </div>
+                    <div class="my-4 border-t border-solid border-gray-600 border-t-4 border-opacity-75 mx-0 w-full"></div>
+                    <div class="mb-4">
+                        <p class="text-gray-700">${book[0].fields.description}</p>
+                    </div>
+                    <div class="mb-4 flex items-center">
+                        <span class="mr-2">${avgRating.toFixed(1)}</span>
+                        <div class="star-ratings">
+                            <div class="fill-ratings" style="width: ${avgRating*20}%;">
+                                <span>★★★★★</span>
+                            </div>
+                            <div class="empty-ratings">
+                                <span>★★★★★</span>
+                            </div>
+                        </div>
+                        <span class="ml-2">(${reviews.length} ${messageRating})</span>
+                    </div>
+                    <div class="mb-4">
+                        <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" data-bs-target="#add-review-modal" class="custom-button" type="button" onclick="toggleModal()">
+                            Add Review
+                        </button>
+                    </div>
+                </div>`;
+            
+            $(document).ready(function() {
+                var star_rating_width = $('.fill-ratings span').width();
+                $('.star-ratings').width(star_rating_width);
+            });
+            container.innerHTML = htmlString;
+            rating(avgRating);
+        }
+
         async function refreshReviews() {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             const container = document.getElementById("review_container");
@@ -121,7 +247,6 @@
             
             const reviews = await getReviews();
             const stars = ['1', '2', '3', '4', '5'];
-            console.log(reviews)
             
             let htmlString = '';
 
@@ -135,11 +260,14 @@
 
                             <!-- display rating in star component -->
                             <div class="flex space-x-1">
-                                ${stars.map(star => (
-                                    `<svg fill="${review.fields.star_fill}" class="w-6 h-6" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M10 2l2.5 6.5h7L12 13l2.5 6.5L10 16l-7.5 3L5 13l-7.5-3h7L10 2z"/>
-                                    </svg>`
-                                )).join("")}
+                                <div class="star-ratings">
+                                    <div class="fill-ratings" style="width: ${review.fields.review_score*20}%;">
+                                        <span>★★★★★</span>
+                                    </div>
+                                    <div class="empty-ratings">
+                                        <span>★★★★★</span>
+                                    </div>
+                                </div>
                             </div>
                             <p class="text-gray-700 text-base">${review.fields.review_text}</p>
 
@@ -150,7 +278,11 @@
                     </div>
                 </div>`;
             });
-
+            $(document).ready(function() {
+                var star_rating_width = $('.fill-ratings span').width();
+                $('.star-ratings').width(star_rating_width);
+            });
+            showBook()
             container.innerHTML = htmlString;
         }
 
@@ -159,23 +291,28 @@
                 method: "POST",
                 body: new FormData(document.querySelector('#form'))
             }).then(refreshReviews)
-            closeModal
+            closeModal()
 
             document.getElementById("form").reset()
             return false
         }
-        function closeModal() {
-            let modal = document.getElementById('add-review-modal');
-            let btn = document.getElementById("btn_submit");
-
-            btn.onclick = function(){
-                modal.classList.remove("hidden")
-            }
-        }
-
         
-
-    refreshReviews()
+        function closeModal() {
+            var modal = document.getElementById('add-review-modal');
+            modal.classList.add('hidden');
+        }
+        
+        function rating( stars ) {
+            const star_rating = document.getElementById('total_rating');
+            const cw = star_rating.clientWidth; // save original 100% pixel width
+            star_rating.style.width = Math.round(cw * (stars / 5)) + 'px';
+        }
+        function toggleModal() {
+            var modal = document.getElementById('add-review-modal');
+            modal.classList.toggle('hidden');
+        }
+        showBook()
+        refreshReviews()
     </script>
     
 {% endblock content %}

@@ -50,6 +50,11 @@ def get_review_json(request, book_id):
     return HttpResponse(serializers.serialize('json', review_item))
 
 
+def get_book_json(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+    return HttpResponse(serializers.serialize('json', [book]))
+
+
 @csrf_exempt
 def add_review_ajax(request, book_id1, book_id2):
     if request.method == 'POST':
