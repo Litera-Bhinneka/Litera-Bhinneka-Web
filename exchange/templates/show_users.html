@@ -6,10 +6,14 @@
         Back
     </a>
     
+    <a href="{% url 'exchange:show_offers' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        My Offers
+    </a>
+
     <div class="flex flex-wrap justify-center">
         {% for user in users %}
         <div class="max-w-sm m-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
-            <img class="w-full h-48 object-cover" src="/docs/images/people/profile-picture-1.jpg" alt="User Image">
+            <img class="w-full h-48 object-cover" src="https://media.discordapp.net/attachments/1054028087551078452/1167449134421254194/def.png?ex=654e2abb&is=653bb5bb&hm=627c977e5a4ddfc7fde42bede685dd1430d9f8bd22a155811a9cc2f9e1c185cc&=&width=125&height=125" alt="User Image">
             <div class="p-4">
                 <h2 class="text-xl font-semibold text-gray-800 dark-text-gray-200">{{user.username}}</h2>
                 <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover-bg-blue-600 focus-ring-2 focus-ring-blue-400 focus-outline-none" onclick="openModal(this.getAttribute('data-username'))" data-username="{{user.username}}">
@@ -20,50 +24,59 @@
         {% endfor %}
     </div>
 
-    {% for user in users %}
-    <div id="inventoryModal-{{ user.username }}" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div id="inventoryModal" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none;">
         <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
             <div class="modal-content py-4 text-left px-6">
                 <div class="flex justify-between items-center pb-3">
-                    <p class="text-2xl font-bold">{{ user.username }}'s Inventory</p>
-                    <button class="modal-close" onclick="closeModal(this.getAttribute('data-username'))" data-username="{{user.username}}">
+                    <p class="text-2xl font-bold" id="userInventory"></p>
+                    <button class="modal-close" onclick="closeModal()">
                         <span class="text-2xl">&times;</span>
                     </button>
                 </div>
-                <div id="books-{{ user.username }}">
-                    <!-- Books will be displayed here -->
-                    <ul>
-                        {% for item in inventory_data %}
-                            <li>{{item.book.title}}</li>
-                        {% endfor %}
-                    </ul>
+                <div id="books">
                 </div>
-                <a href="{% url 'exchange:offer_user' username=user.username %}" class="bg-blue-500 hover-bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button id="sendOfferLink" class="bg-blue-500 hover-bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Send Offer
-                </a>
+                </button>
             </div>
         </div>
-    </div>
-    {% endfor %}
+    </div>    
 </div>
 
 <script>
+    $(document).ready(function () {
+        // Handle the "Send Offer" link
+        $("#sendOfferLink").click(function () {
+            var url = "/exchange/offer-user/";
+            window.location.href = url;
+        });
+    });
 
-    async function openModal(username) {
-        document.getElementById(`inventoryModal-${username}`).classList.remove('hidden');
-        // const books = await getBooks(username);
-        // const container = document.getElementById(`books-${username}`);
-        // container.innerHTML = '';
-
-        // books.forEach((book, index, array) => {
-        //     const book_display = document.createElement('li');
-        //     book_display.textContent = 'Title: ' + book.fields.title;
-        //     container.appendChild(book_display);
-        // });
+    function closeModal() {
+        // Hide the modal
+        $("#inventoryModal").hide();
+        // Perform any additional actions as needed
     }
 
-    function closeModal(username) {
-        document.getElementById(`inventoryModal-${username}`).classList.add('hidden');
+
+    async function getInventory(username) {
+        return fetch("/exchange/offer-user/" + username + "/").then((res) => res.json())
     }
+
+    function openModal(username) {
+        $("#userInventory").text(username + "'s Inventory")
+
+        $("#sendOfferLink").click(function () {
+            var url = "/exchange/offer-user/" + username + "/";
+            window.location.href = url;
+        });
+
+        const books = getInventory(username);
+        console.log(books)
+
+        $("#inventoryModal").show();
+
+    }
+
 </script>
 {% endblock content %}
