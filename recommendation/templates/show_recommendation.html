@@ -42,7 +42,7 @@
     .card-text {
         color: #4a5568;
         font-size: 1rem;
-        margin-bottom: 1rem;
+        /* margin-bottom: 1rem; */
     }
 
     .card-desc {
@@ -110,7 +110,7 @@
             </button>
             <div class="px-6 py-6 lg:px-8">
                 <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Write your recommendation!</h3>
-                <form class="space-y-6" action="#">
+                <form id="form" class="space-y-6" action="#">
                     <div>
                         <label for="owned_book" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Choose your book that you would like to make a recommendation for</label>
                         <select id="owned_book" class="owned_book bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -128,9 +128,12 @@
                         <img src="" id="book-image2" alt="book image">
                     </div>
                     <div></div>
-                        <label for="desciprion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                        <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
                         <textarea name="description_text" id="description" rows="6" class="resize-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-800 focus:border-green-800 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="Why do you recommend the book" required></textarea>
-                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" style="font-family: 'Dosis', sans-serif; font-weight: bold;">Next</button>
+                    <div class="flex justify-between">
+                        <button type="submit" id="submit-button" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" style="font-family: 'Dosis', sans-serif; font-weight: bold; margin-right: 8px;">Submit</button>
+                        <button type="button" data-modal-hide="authentication-modal" class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" style="font-family: 'Dosis', sans-serif; font-weight: bold;">Cancel</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -146,6 +149,12 @@
     async function getRecommendations() {
         return fetch("{% url 'recommendation:get_recommendation_json' %}").then((res) => res.json())
     }
+    async function getIdBooks(){
+        const response = await fetch("{% url 'recommendation:get_book_ids' %}")
+        const data = await response.json();
+        const bookIds = data.book_ids;
+        return bookIds
+    }
     async function getUserBooks(){
         const response = await fetch("{% url 'recommendation:get_user_inventory_json' %}")
         const data = await response.json();
@@ -159,40 +168,56 @@
         return bookImages
     }
     async function refreshRecommendations() {
-        document.getElementById("card-container").innerHTML = ""
+        // document.getElementById("card-container").innerHTML = ""
         const recommendations = await getRecommendations()
-        recommendations.forEach((rec) => {
-            const card = document.createElement("div")
-            card.classList.add("w-full", "p-4")
-            const cardContainer = document.createElement("div")
-            cardContainer.classList.add("card")
-            const cardContent = document.createElement("div")
-            cardContent.classList.add("card-content")
-            const cardTitle = document.createElement("div")
-            cardTitle.classList.add("card-title")
-            cardTitle.innerHTML = `${rec.fields.recommender_name}`
-            const cardText = document.createElement("div")
-            cardText.classList.add("card-text")
-            cardText.innerHTML = `${rec.fields.recommender_name} recommends ${rec.fields.another_book_title}`
-            const cardDesc = document.createElement("div")
-            cardDesc.classList.add("card-desc")
-            cardDesc.innerHTML = `if you like ${rec.fields.book_title}`
-            const cardFooter = document.createElement("div")
-            cardFooter.classList.add("card-footer")
-            const cardDate = document.createElement("span")
-            cardDate.classList.add("card-date")
-            cardDate.innerHTML = rec.fields.recommendation_date
-            cardFooter.appendChild(cardDate)
-            cardContent.appendChild(cardTitle)
-            cardContent.appendChild(cardText)
-            cardContent.appendChild(cardDesc)
-            cardContainer.appendChild(cardContent)
-            cardContainer.appendChild(cardFooter)
-            card.appendChild(cardContainer)
-            document.getElementById("card-container").appendChild(card)
-        })
+        if (recommendations.length === 0){
+            const emptyCard = document.createElement("div");
+            emptyCard.classList.add("w-full", "p-4");
+            const emptyCardContent = document.createElement("div");
+            emptyCardContent.classList.add("card", "text-center");
+            const emptyCardText = document.createElement("div");
+            emptyCardText.classList.add("card-text", "flex", "items-center", "justify-center", "mb-1");
+            emptyCardText.innerHTML = "There are no recommendations yet, Start recommending now!";
+            emptyCardContent.appendChild(emptyCardText);
+            emptyCard.appendChild(emptyCardContent);
+            document.getElementById("card-container").appendChild(emptyCard);
+        }else{
+            recommendations.forEach((rec) => {
+                const card = document.createElement("div")
+                card.classList.add("w-full", "p-4")
+                const cardContainer = document.createElement("div")
+                cardContainer.classList.add("card")
+                const cardContent = document.createElement("div")
+                cardContent.classList.add("card-content")
+                const cardTitle = document.createElement("div")
+                cardTitle.classList.add("card-title")
+                cardTitle.innerHTML = `${rec.fields.recommender_name}`
+                const cardText = document.createElement("div")
+                cardText.classList.add("card-text")
+                cardText.innerHTML = `${rec.fields.recommender_name} recommends ${rec.fields.another_book_title}`
+                const cardDesc = document.createElement("div")
+                cardDesc.classList.add("card-desc")
+                cardDesc.innerHTML = `if you like ${rec.fields.book_title}`
+                const cardFooter = document.createElement("div")
+                cardFooter.classList.add("card-footer")
+                const cardDate = document.createElement("span")
+                cardDate.classList.add("card-date")
+                cardDate.innerHTML = rec.fields.recommendation_date
+                cardFooter.appendChild(cardDate)
+                cardContent.appendChild(cardTitle)
+                cardContent.appendChild(cardText)
+                cardContent.appendChild(cardDesc)
+                cardContainer.appendChild(cardContent)
+                cardContainer.appendChild(cardFooter)
+                card.appendChild(cardContainer)
+                document.getElementById("card-container").appendChild(card)
+            })
+        }
     }
     let selectedBookTitleGlobal;
+    let selectedBookTitleGlobal2;
+    let selectedBookIdGlobal;
+    let selectedBookIdGlobal2;
     async function refreshInventory(){
         const books_title = await getUserBooks()
         const book_image = await getBookImages()
@@ -210,6 +235,8 @@
                 document.getElementById("label_owned_book2").textContent = "Choose a book similar to " + title;
                 firstItem = title;
                 selectedBookTitleGlobal = title;
+                selectedBookIdGlobal = 0;
+
             } else if (idx == 1){
                 books_title.forEach((title2) => {
                     if(title2 != firstItem){
@@ -219,6 +246,8 @@
                         selectedElement2.appendChild(option2);
                     }
                 });
+                selectedBookTitleGlobal2 = books_title[1];
+                selectedBookIdGlobal2 = 1;
                 document.getElementById("book-image2").setAttribute("src", book_image[1]);
             }
         });
@@ -245,6 +274,7 @@
         let newImageSource = bookImages[selectedIndex];
         const selectedBookTitle = $(this).val();
         selectedBookTitleGlobal = selectedBookTitle;
+        selectedBookIdGlobal = bookTitles.indexOf(selectedBookTitle);
 
         $("#book-image").attr("src", newImageSource);
         $("#label_owned_book2").text("Choose a book similar to " + selectedBookTitle);
@@ -259,8 +289,12 @@
         });
         if(selectedIndex == 0){
             document.getElementById("book-image2").setAttribute("src", bookImages[1]);
+            selectedBookTitleGlobal2 = bookTitles[1];
+            selectedBookIdGlobal2 = 1;
         }else{
             document.getElementById("book-image2").setAttribute("src", bookImages[0]);
+            selectedBookTitleGlobal2 = bookTitles[0];
+            selectedBookIdGlobal2 = 0;
         }
         });
     });
@@ -272,13 +306,37 @@
         bookImages.splice(bookTitles.indexOf(selectedBookTitleGlobal), 1);
         
         let selectedIndex = $(this).prop("selectedIndex");
-        console.log(selectedIndex)
         let newImageSource = bookImages[selectedIndex];
         const selectedBookTitle = $(this).val();
-        console.log(selectedBookTitle);
+        selectedBookTitleGlobal2 = selectedBookTitle;
+        selectedBookIdGlobal2 = bookTitles.indexOf(selectedBookTitle);
+        
         $("#book-image2").attr("src", newImageSource);
         });
     });
+    document.getElementById("submit-button").onclick = addRecommendationAjax
+ 
+    async function addRecommendationAjax() {
+        const bookIds = await getIdBooks()
+        let idBook = 0;
+        let idBook2 = 0;
+        if(selectedBookIdGlobal != undefined && selectedBookIdGlobal2 != undefined){
+            idBook = bookIds[selectedBookIdGlobal];
+            idBook2 = bookIds[selectedBookIdGlobal2];
+        }
+        console.log(idBook);
+        console.log(idBook2);
+        let url = `{% url 'recommendation:add_recommendation_ajax' bookId1=0 bookId2=0 %}`;  // Default values
+        url = url.replace("0", idBook).replace("0", idBook2);
+        console.log(url);
+        fetch(url, {
+            method: "POST",
+            body: new FormData(document.querySelector('#form'))
+        }).then(refreshRecommendations)
+
+        document.getElementById("description").value = ""
+        return false
+    }
     function addRecommendation() {
         fetch("{% url 'recommendation:add_recommendation_ajax' %}", {
             method: "POST",

@@ -6,5 +6,6 @@ class RecommendationForm(ModelForm):
         model = Recommendation
         fields = ['book_title',
                 'another_book_title',
+                'recommender_name',
                 'recommendation_scale',
                 'description']
