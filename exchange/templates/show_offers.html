@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4">
+    <h2 class="text-2xl font-bold mb-4">Offers Sent</h2>
+    <ul class="space-y-4">
+        {% for offer in sent %}
+        <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
+            <div>
+                <div class="text-lg font-semibold mb-2">To {{ offer.Username1 }}</div>
+                <!-- Add additional offer details here if needed -->
+            </div>
+            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Cancel</button>
+        </li>
+        {% empty %}
+        <li class="text-gray-600">
+            You haven't sent any offers.
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h2 class="text-2xl font-bold mt-4 mb-4">Offers Received</h2>
+    <ul class="space-y-4">
+        {% for offer in received %}
+        <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
+            <div>
+                <div class="text-lg font-semibold mb-2">From {{ offer.Username2 }}</div>
+                <!-- Add additional offer details here if needed -->
+            </div>
+            <div>
+                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" data-offer-id="{{ offer.id }}" id = "accept">Accept</button>
+                <button class="bg-red-500 text-white px-4 py-2 ml-4 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Reject</button>
+            </div>
+        </li>
+        {% empty %}
+        <li class="text-gray-600">
+            You haven't received any offers.
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<script>
+    const csrfToken = "{{ csrf_token }}";
+
+    $(document).ready(function() {
+        $("#delete").click(function() {
+            // Retrieve the offer ID from the data attribute
+            var offerId = $(this).data("offer-id");
+            
+            // Send an AJAX request to the server to cancel the offer
+            $.ajax({
+                url: "/exchange/delete-offer/" + offerId + "/",  // Replace with your actual URL
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,  // Include the CSRF token in the request headers
+                },
+                success: function(response) {
+                    // Handle the response as needed
+                    // For example, you can delete the canceled offer from the list
+                    // or display a success message.
+                }
+            });
+        });
+
+        $("#accept").click(function() {
+            // Retrieve the offer ID from the data attribute
+            var offerId = $(this).data("offer-id");
+            
+            // Send an AJAX request to the server to cancel the offer
+            $.ajax({
+                url: "/exchange/accept-offer/" + offerId + "/",  // Replace with your actual URL
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,  // Include the CSRF token in the request headers
+                },
+                success: function(response) {
+                    // Handle the response as needed
+                    // For example, you can delete the canceled offer from the list
+                    // or display a success message.
+                }
+            });
+        });
+    });
+</script>
+{% endblock content %}
