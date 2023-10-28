@@ -9,17 +9,37 @@
     window.bookIdsUrl = "{% url 'recommendation:get_book_ids' %}";
     window.userInventoryUrl = "{% url 'recommendation:get_user_inventory_json' %}";
     window.bookImageUrl = "{% url 'recommendation:get_book_image' %}";
+    window.recommendationSearchUrl = "{% url 'recommendation:search_recommendation' %}?query=";
 </script>
 {% endblock meta%}
 {% block content %}
 <div class="text-center" id="judul">
     <strong class="text-2xl md:text-5xl lg:text-7xl xl:text-10xl">User Recommendations</strong>
+    <br>
+    <p class="judul-desc">In our catalog</p>
 </div>
 <div class="">
     <button data-modal-target="add-recommendation-modal" data-modal-toggle="add-recommendation-modal" class="custom-button" type="button">
         Write Recommendation
     </button>
-</div> 
+</div>
+<div class="justify-center mt-4 ml-4 mr-4">
+    <form id="searchForm" class="relative">
+        <label for="default-search" class="sr-only">Search</label>
+        <div class="flex items-center">
+            <div class="flex-shrink-0 ml-5">
+                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                </svg>
+            </div>
+            <input type="search" id="default-search" class="ml-5 mr-5 w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Titles and Users...">
+            <button type="submit" class="text-white ml-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+        </div>
+    </form>
+</div>
+
+<div id="searchResults" class="mt-4 ml-6">
+</div>
 <!-- Main modal -->
 <div id="add-recommendation-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-md max-h-full">

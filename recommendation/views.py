@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 # Create your views here.
 @login_required(login_url='/authentication/login/')
@@ -50,6 +51,22 @@ def add_recommendation_ajax(request, bookId1, bookId2):
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
 
+def search_recommendation(request):
+    if request.method == 'GET':
+        query = request.GET.get('query', '')
+
+        if query:
+            recs = Recommendation.objects.filter(Q(book_title__icontains=query) | Q(another_book_title__icontains=query) | Q(recommender_name__icontains=query))
+        else:
+            recs = Recommendation.objects.all()
+        print(recs)
+        recs_list = [{'pk': rec.pk, 'book_title': rec.book_title, 'another_book_title': rec.another_book_title, 'book_id': rec.book_id, 'another_book_id': rec.another_book_id, 'book_image': rec.book_image, 'another_book_image': rec.another_book_image, 'recommender_name': rec.recommender_name, 'recommendation_scale': rec.recommendation_scale, 'description': rec.description, 'recommendation_date': rec.recommendation_date} for rec in recs]
+        for rec in recs_list:
+            print(rec['description'])
+        return JsonResponse({'recommendations': recs_list})
+    else:
+        return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400)
+    
 def get_user_inventory_json(request):
     user = request.user
     inventory = Inventory.objects.filter(user=user)
