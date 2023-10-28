@@ -40,7 +40,7 @@ def add_recommendation_ajax(request, bookId1, bookId2):
         book_title2 = get_object_or_404(Book, pk=bookId2).title
         book_image1 = get_object_or_404(Book, pk=bookId1).image_link
         book_image2 = get_object_or_404(Book, pk=bookId2).image_link
-        new_product = Recommendation(book_title=book_title1, another_book_title=book_title2, book_image=book_image1, another_book_image=book_image2, description=description, recommendation_scale=0, recommender_name=recommender_name)
+        new_product = Recommendation(book_title=book_title1, another_book_title=book_title2, book_id=bookId1, another_book_id=bookId2, book_image=book_image1, another_book_image=book_image2, description=description, recommendation_scale=0, recommender_name=recommender_name)
         new_product.save()
 
         return HttpResponse(b"CREATED", status=201)
