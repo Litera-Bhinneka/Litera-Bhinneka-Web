@@ -60,10 +60,10 @@
 
 
     async function getInventory(username) {
-        return fetch("/exchange/offer-user/" + username + "/").then((res) => res.json())
+        return fetch("/exchange/get-books/" + username + "/").then((res) => res.json())
     }
 
-    function openModal(username) {
+    async function openModal(username) {
         $("#userInventory").text(username + "'s Inventory")
 
         $("#sendOfferLink").click(function () {
@@ -71,7 +71,7 @@
             window.location.href = url;
         });
 
-        const books = getInventory(username);
+        const books = await getInventory(username);
         console.log(books)
 
         $("#inventoryModal").show();

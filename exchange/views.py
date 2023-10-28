@@ -104,7 +104,8 @@ def delete_offer(request, id):
     if request.method == 'POST':
         offer = Offer.objects.get(id=id)
         offer.delete()
-    return redirect('/')
+        return JsonResponse({"message": "Successfully removed the Offer"}, status=200)
+    return JsonResponse({"message": "Invalid request method"}, status=400)
 
 @login_required(login_url='/authentication/login/')
 def accept_offer(request, id):
@@ -154,5 +155,5 @@ def accept_offer(request, id):
             inventory.save()
 
         offer.delete()
-        return JsonResponse({"message": "Offer accepted and processed"}, status=200)
+        return JsonResponse({"message": "Exchange successful. Your Inventory has been updated"}, status=200)
     return JsonResponse({"message": "Invalid request method"}, status=400)

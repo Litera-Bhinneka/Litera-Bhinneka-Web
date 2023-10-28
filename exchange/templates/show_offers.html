@@ -39,10 +39,55 @@
         {% endfor %}
     </ul>
 </div>
+
+<!-- Modal for Prompt -->
+<div id="modalPrompt" class="fixed inset-0 flex items-center justify-center z-10 hidden">
+    <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
+    <div class="modal-container bg-white w-1/2 md:w-1/3 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+        <span id="modalPromptClose" class="absolute top-0 right-0 m-4 text-gray-600 cursor-pointer">&times;</span>
+        <p id="modalPromptMessage" class="text-lg font-semibold mb-2"></p>
+    </div>
+</div>
+
 <script>
     const csrfToken = "{{ csrf_token }}";
 
     $(document).ready(function() {
+        function openModalPrompt(message) {
+            $("#modalPromptMessage").text(message);
+            $("#modalPrompt").removeClass("hidden");
+        }
+
+        function closeModalPrompt() {
+            $("#modalPrompt").addClass("hidden");
+            location.reload();
+        }
+
+        function sendAcceptRequest(offerId) {
+            $.ajax({
+                url: "/exchange/accept-offer/" + offerId + "/",
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                },
+                success: function(response) {
+                    if (response.message) {
+                        openModalPrompt(response.message);
+                    } else {
+                        openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                    }
+                },
+                error: function() {
+                    openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                },
+            });
+        }
+
+        $("#accept").click(function() {
+            var offerId = $(this).data("offer-id");
+            sendAcceptRequest(offerId);
+        });
+
         $("#delete").click(function() {
             // Retrieve the offer ID from the data attribute
             var offerId = $(this).data("offer-id");
@@ -55,31 +100,23 @@
                     "X-CSRFToken": csrfToken,  // Include the CSRF token in the request headers
                 },
                 success: function(response) {
-                    // Handle the response as needed
-                    // For example, you can delete the canceled offer from the list
-                    // or display a success message.
-                }
+                    if (response.message) {
+                        openModalPrompt(response.message);
+                    } else {
+                        openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                    }
+                },
+                error: function() {
+                    openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                },
             });
         });
 
-        $("#accept").click(function() {
-            // Retrieve the offer ID from the data attribute
-            var offerId = $(this).data("offer-id");
-            
-            // Send an AJAX request to the server to cancel the offer
-            $.ajax({
-                url: "/exchange/accept-offer/" + offerId + "/",  // Replace with your actual URL
-                type: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,  // Include the CSRF token in the request headers
-                },
-                success: function(response) {
-                    // Handle the response as needed
-                    // For example, you can delete the canceled offer from the list
-                    // or display a success message.
-                }
-            });
+        // Close the modal prompt when the close button is clicked
+        $("#modalPromptClose").click(function() {
+            closeModalPrompt();
         });
     });
+
 </script>
 {% endblock content %}
