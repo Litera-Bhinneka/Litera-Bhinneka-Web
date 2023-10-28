@@ -8,4 +8,6 @@ class RecommendationForm(ModelForm):
                 'another_book_title',
                 'recommender_name',
                 'recommendation_scale',
+                'book_image',
+                'another_book_image',
                 'description']
