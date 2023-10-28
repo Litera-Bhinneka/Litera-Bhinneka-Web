@@ -1,14 +1,17 @@
 from django.shortcuts import render
 from .models import Recommendation
 from catalog.models import Book
-from django.http import HttpResponse, HttpResponseRedirect
+from manage_user.models import Inventory
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from .forms import RecommendationForm
 from django.core import serializers
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required(login_url='/authentication/login/')
 def show_recommendation(request):
     recommendations = Recommendation.objects.all().values()
     context = {
@@ -17,6 +20,7 @@ def show_recommendation(request):
     }
     return render(request, 'show_recommendation.html', context)
 
+@csrf_exempt
 def add_recommendation(request):
     form = RecommendationForm(request.POST or None)
 
@@ -29,25 +33,46 @@ def add_recommendation(request):
     context = {'form': form}
     return render(request, "add_recommendation.html", context)
 
-# @csrf_exempt
-# def add_product_ajax(request):
-#     if request.method == 'POST':
-#         name = request.POST.get("name")
-#         price = request.POST.get("price")
-#         description = request.POST.get("description")
-#         user = request.user
+@login_required(login_url='/authentication/login/')
+@csrf_exempt
+def add_recommendation_ajax(request, bookId1, bookId2):
+    form = RecommendationForm(request.POST or None)
+    if request.method == 'POST':
+        recommender_name = request.user.username
+        description = request.POST.get("description_text")
+        book_title1 = get_object_or_404(Book, pk=bookId1).title
+        book_title2 = get_object_or_404(Book, pk=bookId2).title
+        book_image1 = get_object_or_404(Book, pk=bookId1).image_link
+        book_image2 = get_object_or_404(Book, pk=bookId2).image_link
+        new_product = Recommendation(book_title=book_title1, another_book_title=book_title2, book_id=bookId1, another_book_id=bookId2, book_image=book_image1, another_book_image=book_image2, description=description, recommendation_scale=0, recommender_name=recommender_name)
+        new_product.save()
 
-#         new_product = Recommendation(name=name, price=price, description=description, user=user)
-#         new_product.save()
+        return HttpResponse(b"CREATED", status=201)
+    return HttpResponseNotFound()
 
-#         return HttpResponse(b"CREATED", status=201)
+def get_user_inventory_json(request):
+    user = request.user
+    inventory = Inventory.objects.filter(user=user)
+    book_title = []
+    for i in inventory:
+        book_title.append(i.book.title)
+    return JsonResponse({'book_titles': book_title})
 
-#     return HttpResponseNotFound()
+def get_book_image(request):
+    user = request.user
+    inventory = Inventory.objects.filter(user=user)
+    book_image = []
+    for i in inventory:
+        book_image.append(i.book.image_link)
+    return JsonResponse({'book_images': book_image})
 
-def find_book_id(request, book_name):
-    book = get_object_or_404(Book, title=book_name)
-
-    return redirect('review:book_review', id=book.id)
+def get_book_ids(request):
+    user = request.user
+    inventory = Inventory.objects.filter(user=user)
+    book_ids = []
+    for i in inventory:
+        book_ids.append(i.book.id)
+    return JsonResponse({'book_ids': book_ids})
 
 def get_recommendation_json(request):
     rec = Recommendation.objects.all()
