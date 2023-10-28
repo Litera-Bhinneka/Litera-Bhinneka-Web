@@ -4,7 +4,51 @@
 <div class="p-4">
     <a href="{% url 'exchange:show_books' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
         Back
-    </a><br><br>
+    </a>
+    {% if isadmin %}
+    <a href="{% url 'admin:index' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Admin
+    </a>
+    {% endif %}
+    <br><br>
+    {% if isadmin %}
+    <h2 class="text-2xl font-bold mb-4">Offers</h2>
+    <ul class="space-y-4">
+        {% for offer in offers %}
+        <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
+            <div>
+                <div class="text-lg font-semibold mb-2">From {{offer.user2_name}} To {{ offer.user1_name }}</div>
+                <!-- Add additional offer details here if needed -->
+                {{offer.user2_name}} Offered:
+                <div class="flex space-x-4">
+                    {% for item in offer.user2_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+                For {{offer.user1_name}}'s:
+                <div class="flex space-x-4">
+                    {% for item in offer.user1_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+            </div>
+            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Delete</button>
+        </li>
+        {% empty %}
+        <li class="text-gray-600">
+            There are no offers.
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
     <h2 class="text-2xl font-bold mb-4">Offers Sent</h2>
     <ul class="space-y-4">
         {% for offer in sent_offers %}
@@ -81,6 +125,7 @@
         </li>
         {% endfor %}
     </ul>
+    {% endif %}
 </div>
 
 <!-- Modal for Prompt -->

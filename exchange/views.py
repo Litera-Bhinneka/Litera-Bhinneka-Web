@@ -23,6 +23,7 @@ def show_books(request):
     context = {
         'books': books,
         'name': request.user.username,
+        'isadmin' : request.user.is_superuser,
     }
 
     return render(request, "show_owners.html", context)
@@ -90,41 +91,64 @@ def add_offer(request):
 
 @login_required(login_url='/authentication/login/')
 def show_offers(request):
-    offers_sent = Offer.objects.filter(Username2=request.user.username)
-    offers_received = Offer.objects.filter(Username1=request.user.username)
+    if request.user.is_superuser:
+        offers = Offer.objects.all()
+        res = []
+        for offer in offers:
+            user1_items = json.loads(offer.Inventory1)
+            user2_items = json.loads(offer.Inventory2)
+            user1_name = offer.Username1
 
-    sent_offers = []
-    received_offers = []
+            res.append({
+                'user1_items': user1_items,
+                'user2_items': user2_items,
+                'user1_name': user1_name,
+                'id': offer.pk,
+            })
+        
+        context = {
+            'offers': res,
+            'name': request.user.username,
+            'isadmin' : request.user.is_superuser,
+        }
 
-    for offer in offers_sent:
-        user1_items = json.loads(offer.Inventory1)
-        user2_items = json.loads(offer.Inventory2)
-        user1_name = offer.Username1
+    else:
+        offers_sent = Offer.objects.filter(Username2=request.user.username)
+        offers_received = Offer.objects.filter(Username1=request.user.username)
 
-        sent_offers.append({
-            'user1_items': user1_items,
-            'user2_items': user2_items,
-            'user1_name': user1_name,
-            'id': offer.pk,
-        })
+        sent_offers = []
+        received_offers = []
 
-    for offer in offers_received:
-        user1_items = json.loads(offer.Inventory1)
-        user2_items = json.loads(offer.Inventory2)
-        user2_name = offer.Username2
+        for offer in offers_sent:
+            user1_items = json.loads(offer.Inventory1)
+            user2_items = json.loads(offer.Inventory2)
+            user1_name = offer.Username1
 
-        received_offers.append({    
-            'user1_items': user1_items,
-            'user2_items': user2_items,
-            'user2_name': user2_name,
-            'id': offer.pk,
-        })
+            sent_offers.append({
+                'user1_items': user1_items,
+                'user2_items': user2_items,
+                'user1_name': user1_name,
+                'id': offer.pk,
+            })
 
-    context = {
-        'sent_offers': sent_offers,
-        'received_offers': received_offers,
-        'name': request.user.username,
-    }
+        for offer in offers_received:
+            user1_items = json.loads(offer.Inventory1)
+            user2_items = json.loads(offer.Inventory2)
+            user2_name = offer.Username2
+
+            received_offers.append({    
+                'user1_items': user1_items,
+                'user2_items': user2_items,
+                'user2_name': user2_name,
+                'id': offer.pk,
+            })
+
+        context = {
+            'sent_offers': sent_offers,
+            'received_offers': received_offers,
+            'name': request.user.username,
+            'isadmin' : request.user.is_superuser,
+        }
 
     return render(request, "show_offers.html", context)
 
