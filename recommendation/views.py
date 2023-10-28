@@ -18,6 +18,7 @@ def show_recommendation(request):
     }
     return render(request, 'show_recommendation.html', context)
 
+@csrf_exempt
 def add_recommendation(request):
     form = RecommendationForm(request.POST or None)
 
@@ -37,13 +38,12 @@ def add_recommendation_ajax(request, bookId1, bookId2):
         description = request.POST.get("description_text")
         book_title1 = get_object_or_404(Book, pk=bookId1).title
         book_title2 = get_object_or_404(Book, pk=bookId2).title
-        print(bookId1)
-        print(bookId2)
-        new_product = Recommendation(book_title=book_title1, another_book_title=book_title2, description=description, recommendation_scale=0, recommender_name=recommender_name)
+        book_image1 = get_object_or_404(Book, pk=bookId1).image_link
+        book_image2 = get_object_or_404(Book, pk=bookId2).image_link
+        new_product = Recommendation(book_title=book_title1, another_book_title=book_title2, book_image=book_image1, another_book_image=book_image2, description=description, recommendation_scale=0, recommender_name=recommender_name)
         new_product.save()
 
         return HttpResponse(b"CREATED", status=201)
-
     return HttpResponseNotFound()
 
 def get_user_inventory_json(request):
