@@ -70,7 +70,7 @@ def add_offer(request):
         user1_inventory = [{'book_id': int(book_ids[i]), 'quantity': int(user1_item_quantities[i])}
                           for i in range(len(user1_item_quantities)) if int(user1_item_quantities[i]) > 0]
         user2_inventory = [{'book_id': int(book_ids[i + len(user1_item_quantities)]), 'quantity': int(user2_item_quantities[i])}
-                          for i in range(len(user2_item_quantities)) if int(user1_item_quantities[2]) > 0]
+                          for i in range(len(user2_item_quantities)) if int(user2_item_quantities[i]) > 0]
 
         # Create an instance of the Offer model and populate its fields
         offer = Offer(
@@ -92,9 +92,64 @@ def show_offers(request):
     offers_sent = Offer.objects.filter(Username2=request.user.username)
     offers_received = Offer.objects.filter(Username1=request.user.username)
 
+    sent_offers = []
+    received_offers = []
+
+    for offer in offers_sent:
+        user1_items = json.loads(offer.Inventory1)
+        user2_items = json.loads(offer.Inventory2)
+        user1_name = offer.Username1
+
+        for item in user1_items:
+            try:
+                book = Book.objects.get(id=item['book_id'])
+                item['book_title'] = book.title
+            except Book.DoesNotExist:
+                item['book_title'] = 'Book not Found'
+
+        for item in user2_items:
+            try:
+                book = Book.objects.get(id=item['book_id'])
+                item['book_title'] = book.title
+            except Book.DoesNotExist:
+                item['book_title'] = 'Book not Found'
+
+        sent_offers.append({
+            'user1_items': user1_items,
+            'user2_items': user2_items,
+            'user1_name': user1_name,
+            'id': offer.pk,
+        })
+
+    for offer in offers_received:
+        user1_items = json.loads(offer.Inventory1)
+        user2_items = json.loads(offer.Inventory2)
+        user2_name = offer.Username2
+
+        for item in user1_items:
+            try:
+                book = Book.objects.get(id=item['book_id'])
+                item['book_title'] = book.title
+            except Book.DoesNotExist:
+                item['book_title'] = 'Book not Found'
+
+        for item in user2_items:
+            try:
+                book = Book.objects.get(id=item['book_id'])
+                item['book_title'] = book.title
+            except Book.DoesNotExist:
+                item['book_title'] = 'Book not Found'
+
+        received_offers.append({    
+            'user1_items': user1_items,
+            'user2_items': user2_items,
+            'user2_name': user2_name,
+            'id': offer.pk,
+        })
+
     context = {
-        'sent': offers_sent,
-        'received': offers_received,
+        'sent_offers': sent_offers,
+        'received_offers': received_offers,
         'name': request.user.username,
     }
 
@@ -126,7 +181,7 @@ def accept_offer(request, id):
                 continue
             elif amount > inventory1.amount:
                 return JsonResponse({"message": "The requested amount exceeds available inventory"}, status=400)
-            inventory2 = Inventory.objects.get_or_create(user=user2, book=book, amount=0)[0]
+            inventory2 = Inventory.objects.get_or_create(user=user2, book=book, defaults={"amount": 0})[0]
             inventory1.amount -= amount
             inventory2.amount += amount
             inventories.append(inventory2)
@@ -143,7 +198,7 @@ def accept_offer(request, id):
                 continue
             elif amount > inventory2.amount:
                 return JsonResponse({"message": "The requested amount exceeds available inventory"}, status=400)
-            inventory1 = Inventory.objects.get_or_create(user=user1, book=book, amount=0)[0]
+            inventory1 = Inventory.objects.get_or_create(user=user1, book=book, defaults={"amount": 0})[0]
             inventory1.amount += amount
             inventory2.amount -= amount
             inventories.append(inventory1)

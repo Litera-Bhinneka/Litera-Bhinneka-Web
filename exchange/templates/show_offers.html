@@ -7,11 +7,31 @@
     </a><br><br>
     <h2 class="text-2xl font-bold mb-4">Offers Sent</h2>
     <ul class="space-y-4">
-        {% for offer in sent %}
+        {% for offer in sent_offers %}
         <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
             <div>
-                <div class="text-lg font-semibold mb-2">To {{ offer.Username1 }}</div>
+                <div class="text-lg font-semibold mb-2">To {{ offer.user1_name }}</div>
                 <!-- Add additional offer details here if needed -->
+                You Offered:
+                <div class="flex space-x-4">
+                    {% for item in offer.user2_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+                For {{offer.user1_name}}'s:
+                <div class="flex space-x-4">
+                    {% for item in offer.user1_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
             </div>
             <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Cancel</button>
         </li>
@@ -24,11 +44,31 @@
 
     <h2 class="text-2xl font-bold mt-4 mb-4">Offers Received</h2>
     <ul class="space-y-4">
-        {% for offer in received %}
+        {% for offer in received_offers %}
         <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
             <div>
-                <div class="text-lg font-semibold mb-2">From {{ offer.Username2 }}</div>
+                <div class="text-lg font-semibold mb-2">From {{ offer.user2_name }}</div>
                 <!-- Add additional offer details here if needed -->
+                {{offer.user2_name}} Offered:
+                <div class="flex space-x-4">
+                    {% for item in offer.user2_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+                For Your:
+                <div class="flex space-x-4">
+                    {% for item in offer.user1_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
             </div>
             <div>
                 <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" data-offer-id="{{ offer.id }}" id = "accept">Accept</button>
