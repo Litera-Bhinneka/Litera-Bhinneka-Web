@@ -10,18 +10,24 @@
                 <ul>
                     {% for item in user1.inventory_items %}
                     <li class="mb-4">
-                        <div class="bg-gray-100 p-4 rounded-lg shadow-md">
-                            <label for="id_user1_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
-                            <a href="{% url 'review:book_review' id=item.book.id %}" class="block">
-                                <img src="{{ item.book.image_link }}" alt="book cover" class="w-32 h-48 object-cover mb-2 rounded-lg">
-                            </a>
-                            <select name="user1_item_quantities" id="id_user1_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
-                            </select>
+                        <div class="bg-gray-200 p-4 rounded-lg shadow-md flex items-center">
+                            <div class="w-auto">
+                                <a href="{% url 'review:book_review' id=item.book.id %}" class="block">
+                                    <img src="{{ item.book.image_link }}" alt="book cover" class="w-32 h-48 object-cover mb-2 rounded-lg">
+                                </a>
+                                <a href="{% url 'review:book_review' id=item.book.id %}" class="block text-center text-blue-500 font-semibold hover:underline">See Reviews</a>
+                            </div>
+                            <div class="w-3/4 bg-white p-4 rounded-lg shadow-md ml-5">
+                                <label for="id_user1_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
+                                <label for="id_user1_item_quantities_{{ forloop.counter0 }}" class="block text-sm text-gray-600 mb-2">Select Amount</label>
+                                <select name="user1_item_quantities" id="id_user1_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" data-booktitle="{{ item.book.title }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
+                                </select>
+                            </div>
                         </div>
                         <script>
                             var select = $("#id_user1_item_quantities_{{ forloop.counter0 }}");
                             var amount = parseInt(select.attr("max_amount"));
-
+            
                             for (var i = 0; i <= amount; i++) { // Start from 1
                                 var option = $("<option></option>");
                                 option.attr("value", i);
@@ -33,24 +39,30 @@
                     {% endfor %}
                 </ul>
             </div>
-            
+        
             <div>
                 <h2 class="text-xl font-bold mb-4">Your Inventory</h2>
                 <ul>
                     {% for item in user2.inventory_items %}
                     <li class="mb-4">
-                        <div class="bg-gray-100 p-4 rounded-lg shadow-md">
-                            <label for="id_user2_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
-                            <a href="{% url 'review:book_review' id=item.book.id %}" class="block">
-                                <img src="{{ item.book.image_link }}" alt="book cover" class="w-32 h-48 object-cover mb-2 rounded-lg">
-                            </a>
-                            <select name="user2_item_quantities" id="id_user2_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
-                            </select>
+                        <div class="bg-gray-200 p-4 rounded-lg shadow-md flex items-center">
+                            <div class="w-auto">
+                                <a href="{% url 'review:book_review' id=item.book.id %}" class="block">
+                                    <img src="{{ item.book.image_link }}" alt="book cover" class="w-32 h-48 object-cover mb-2 rounded-lg">
+                                </a>
+                                <a href="{% url 'review:book_review' id=item.book.id %}" class="block text-center text-blue-500 font-semibold hover:underline">See Reviews</a>
+                            </div>
+                            <div class="w-3/4 bg-white p-4 rounded-lg shadow-md ml-5">
+                                <label for="id_user2_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
+                                <label for="id_user2_item_quantities_{{ forloop.counter0 }}" class="block text-sm text-gray-600 mb-2">Select Amount</label>
+                                <select name="user2_item_quantities" id="id_user2_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" data-booktitle="{{ item.book.title }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
+                                </select>
+                            </div>
                         </div>
                         <script>
                             var select = $("#id_user2_item_quantities_{{ forloop.counter0 }}");
                             var amount = parseInt(select.attr("max_amount"));
-
+            
                             for (var i = 0; i <= amount; i++) { // Start from 1
                                 var option = $("<option></option>");
                                 option.attr("value", i);
@@ -63,20 +75,81 @@
                 </ul>
             </div>
         </div>
-        <input type="submit" onclick="addOffer(this.getAttribute('data-username'))" data-username="{{user1.user.username}}" value="Send Offer" class="bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700">
+        <div class="text-center">
+            <input type="submit" onclick="addOffer(this.getAttribute('data-username'))" data-username="{{user1.user.username}}" value="Send Offer" class="bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700">
+        </div>
     </form>
+    
+    
+    
+    
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 flex items-center justify-center z-10 hidden">
+    <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
+    <div class="modal-container bg-white w-1/2 md:w-2/3 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+        <span id="successModalClose" class="absolute top-0 right-0 m-4 text-gray-600 cursor-pointer">&times;</span>
+        <p class="text-lg font-semibold mb-2 text-center">Offer successfully sent!</p>
+        <button id="successModalOK" class="block mx-auto bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-700">OK</button>
+    </div>
+</div>
+
+<!-- Failed Modal -->
+<div id="failedModal" class="fixed inset-0 flex items-center justify-center z-10 hidden">
+    <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
+    <div class="modal-container bg-white w-1/2 md:w-2/3 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+        <span id="failedModalClose" class="absolute top-0 right-0 m-4 text-gray-600 cursor-pointer">&times;</span>
+        <p class="text-lg font-semibold mb-2 text-center">Offer sending failed. Please try again.</p>
+        <button id="failedModalOK" class="block mx-auto bg-red-500 text-white rounded-lg p-2 hover-bg-red-700">OK</button>
+    </div>
+</div>
+
+
+
 </div>
 <script>
+    // Get the modals and OK buttons
+    var successModal = document.getElementById("successModal");
+    var failedModal = document.getElementById("failedModal");
+    var successModalOK = document.getElementById("successModalOK");
+    var failedModalOK = document.getElementById("failedModalOK");
+
+    // Function to open the success modal
+    function openSuccessModal() {
+        successModal.classList.remove("hidden");
+    }
+
+    // Function to open the failed modal
+    function openFailedModal() {
+        failedModal.classList.remove("hidden");
+    }
+
+    // Function to close the modals
+    function closeModal() {
+        successModal.classList.add("hidden");
+        failedModal.classList.add("hidden");
+    }
+
+    // Close the modals when the OK buttons are clicked
+    successModalOK.onclick = closeModal;
+    successModalClose.onclick = closeModal;
+    failedModalClose.onclick = closeModal;
+    failedModalOK.onclick = closeModal;
+
+
     function addOffer(username) {
+        event.preventDefault();
         var form = new FormData(document.querySelector('#form'));
         form.append('target_user', username);
 
         // Loop through select elements and add book ID and quantity to the form data
         $("select").each(function() {
             var bookId = $(this).data("bookid");
+            var bookTitle = $(this).data("booktitle");
             var quantity = $(this).val();
             form.append('book_ids', bookId);
             form.append('quantities', quantity);
+            form.append('book_titles', bookTitle);
         });
 
         fetch("{% url 'exchange:add_offer' %}", {
@@ -84,9 +157,9 @@
             body: form
         }).then(response => {
             if (response.ok) {
-                alert("Successful");
+                openSuccessModal();
             } else {
-                console.log("failed")
+                openFailedModal();
             }
         });
 

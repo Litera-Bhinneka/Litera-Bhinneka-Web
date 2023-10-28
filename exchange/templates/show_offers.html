@@ -2,13 +2,80 @@
 
 {% block content %}
 <div class="p-4">
-    <h2 class="text-2xl font-bold mb-4">Offers Sent</h2>
+    <a href="{% url 'exchange:show_books' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Back
+    </a>
+    {% if isadmin %}
+    <a href="{% url 'admin:index' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Admin
+    </a>
+    {% endif %}
+    <br><br>
+    {% if isadmin %}
+    <h2 class="text-2xl font-bold mb-4">Offers</h2>
     <ul class="space-y-4">
-        {% for offer in sent %}
+        {% for offer in offers %}
         <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
             <div>
-                <div class="text-lg font-semibold mb-2">To {{ offer.Username1 }}</div>
+                <div class="text-lg font-semibold mb-2">From {{offer.user2_name}} To {{ offer.user1_name }}</div>
                 <!-- Add additional offer details here if needed -->
+                {{offer.user2_name}} Offered:
+                <div class="flex space-x-4">
+                    {% for item in offer.user2_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+                For {{offer.user1_name}}'s:
+                <div class="flex space-x-4">
+                    {% for item in offer.user1_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+            </div>
+            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Delete</button>
+        </li>
+        {% empty %}
+        <li class="text-gray-600">
+            There are no offers.
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h2 class="text-2xl font-bold mb-4">Offers Sent</h2>
+    <ul class="space-y-4">
+        {% for offer in sent_offers %}
+        <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
+            <div>
+                <div class="text-lg font-semibold mb-2">To {{ offer.user1_name }}</div>
+                <!-- Add additional offer details here if needed -->
+                You Offered:
+                <div class="flex space-x-4">
+                    {% for item in offer.user2_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+                For {{offer.user1_name}}'s:
+                <div class="flex space-x-4">
+                    {% for item in offer.user1_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
             </div>
             <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Cancel</button>
         </li>
@@ -21,11 +88,31 @@
 
     <h2 class="text-2xl font-bold mt-4 mb-4">Offers Received</h2>
     <ul class="space-y-4">
-        {% for offer in received %}
+        {% for offer in received_offers %}
         <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
             <div>
-                <div class="text-lg font-semibold mb-2">From {{ offer.Username2 }}</div>
+                <div class="text-lg font-semibold mb-2">From {{ offer.user2_name }}</div>
                 <!-- Add additional offer details here if needed -->
+                {{offer.user2_name}} Offered:
+                <div class="flex space-x-4">
+                    {% for item in offer.user2_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
+                For Your:
+                <div class="flex space-x-4">
+                    {% for item in offer.user1_items %}
+                    <div class="text-sm">
+                        {{ item.quantity }} x {{ item.book_title }}
+                    </div>
+                    {% empty %}
+                    Nothing
+                    {% endfor %}
+                </div>
             </div>
             <div>
                 <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" data-offer-id="{{ offer.id }}" id = "accept">Accept</button>
@@ -38,11 +125,57 @@
         </li>
         {% endfor %}
     </ul>
+    {% endif %}
 </div>
+
+<!-- Modal for Prompt -->
+<div id="modalPrompt" class="fixed inset-0 flex items-center justify-center z-10 hidden">
+    <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
+    <div class="modal-container bg-white w-1/2 md:w-1/3 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+        <span id="modalPromptClose" class="absolute top-0 right-0 m-4 text-gray-600 cursor-pointer">&times;</span>
+        <p id="modalPromptMessage" class="text-lg font-semibold mb-2"></p>
+    </div>
+</div>
+
 <script>
     const csrfToken = "{{ csrf_token }}";
 
     $(document).ready(function() {
+        function openModalPrompt(message) {
+            $("#modalPromptMessage").text(message);
+            $("#modalPrompt").removeClass("hidden");
+        }
+
+        function closeModalPrompt() {
+            $("#modalPrompt").addClass("hidden");
+            location.reload();
+        }
+
+        function sendAcceptRequest(offerId) {
+            $.ajax({
+                url: "/exchange/accept-offer/" + offerId + "/",
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                },
+                success: function(response) {
+                    if (response.message) {
+                        openModalPrompt(response.message);
+                    } else {
+                        openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                    }
+                },
+                error: function() {
+                    openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                },
+            });
+        }
+
+        $("#accept").click(function() {
+            var offerId = $(this).data("offer-id");
+            sendAcceptRequest(offerId);
+        });
+
         $("#delete").click(function() {
             // Retrieve the offer ID from the data attribute
             var offerId = $(this).data("offer-id");
@@ -55,31 +188,23 @@
                     "X-CSRFToken": csrfToken,  // Include the CSRF token in the request headers
                 },
                 success: function(response) {
-                    // Handle the response as needed
-                    // For example, you can delete the canceled offer from the list
-                    // or display a success message.
-                }
+                    if (response.message) {
+                        openModalPrompt(response.message);
+                    } else {
+                        openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                    }
+                },
+                error: function() {
+                    openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                },
             });
         });
 
-        $("#accept").click(function() {
-            // Retrieve the offer ID from the data attribute
-            var offerId = $(this).data("offer-id");
-            
-            // Send an AJAX request to the server to cancel the offer
-            $.ajax({
-                url: "/exchange/accept-offer/" + offerId + "/",  // Replace with your actual URL
-                type: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,  // Include the CSRF token in the request headers
-                },
-                success: function(response) {
-                    // Handle the response as needed
-                    // For example, you can delete the canceled offer from the list
-                    // or display a success message.
-                }
-            });
+        // Close the modal prompt when the close button is clicked
+        $("#modalPromptClose").click(function() {
+            closeModalPrompt();
         });
     });
+
 </script>
 {% endblock content %}

@@ -7,24 +7,26 @@ from catalog.models import Book
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 import json
 
 # Create your views here.
 @login_required(login_url='/authentication/login/')
-def show_users(request):
-    users = User.objects.exclude(username=request.user.username)
-    inventory_data = []
+def show_books(request):
+    search_query = request.GET.get('q', '')
 
-    for user in users:
-        inventory_items = Inventory.objects.filter(user=user)
-        inventory_data.append(inventory_items)
+    if search_query:
+        books = Book.objects.filter(Q(title__icontains=search_query)).values()
+    else:
+        books = Book.objects.all().values()
 
     context = {
-        'users': users.values(),
+        'books': books,
         'name': request.user.username,
+        'isadmin' : request.user.is_superuser,
     }
 
-    return render(request, "show_users.html", context)
+    return render(request, "show_owners.html", context)
 
 @login_required(login_url='/authentication/login/')
 def offer_user(request, username):
@@ -50,11 +52,11 @@ def offer_user(request, username):
     return render(request, 'offer_user.html', context)
 
 
-def get_books(request, username):
-    user = get_object_or_404(User, username=username)
-    inventory_items = Inventory.objects.filter(user=user)
-
-    return HttpResponse(serializers.serialize("json", inventory_items))
+def get_owners(request, id):
+    book = get_object_or_404(Book, id=id)  # Retrieve the book
+    # Exclude the user who made the request and filter users from inventories
+    users = User.objects.exclude(username=request.user.username).filter(Q(inventory__book=book)).distinct()
+    return HttpResponse(serializers.serialize("json", users))
 
 @csrf_exempt
 def add_offer(request):
@@ -64,12 +66,13 @@ def add_offer(request):
         user1_item_quantities = form_data.getlist('user1_item_quantities')
         user2_item_quantities = form_data.getlist('user2_item_quantities')
         book_ids = form_data.getlist('book_ids')  # Retrieve book IDs from the form data
+        book_titles = form_data.getlist('book_titles')  # Retrieve book Titles from the form data
 
-        # Combine book IDs and quantities into dictionaries
-        user1_inventory = [{'book_id': int(book_ids[i]), 'quantity': int(user1_item_quantities[i])}
-                          for i in range(len(user1_item_quantities))]
-        user2_inventory = [{'book_id': int(book_ids[i + len(user1_item_quantities)]), 'quantity': int(user2_item_quantities[i])}
-                          for i in range(len(user2_item_quantities))]
+        # Combine book IDs, quantities, and titles into dictionaries
+        user1_inventory = [{'book_id': int(book_ids[i]), 'quantity': int(user1_item_quantities[i]), 'book_title': str(book_titles[i])}
+                          for i in range(len(user1_item_quantities)) if int(user1_item_quantities[i]) > 0]
+        user2_inventory = [{'book_id': int(book_ids[i + len(user1_item_quantities)]), 'quantity': int(user2_item_quantities[i]), 'book_title': str(book_titles[i + len(user1_item_quantities)])}
+                          for i in range(len(user2_item_quantities)) if int(user2_item_quantities[i]) > 0]
 
         # Create an instance of the Offer model and populate its fields
         offer = Offer(
@@ -88,14 +91,64 @@ def add_offer(request):
 
 @login_required(login_url='/authentication/login/')
 def show_offers(request):
-    offers_sent = Offer.objects.filter(Username2=request.user.username)
-    offers_received = Offer.objects.filter(Username1=request.user.username)
+    if request.user.is_superuser:
+        offers = Offer.objects.all()
+        res = []
+        for offer in offers:
+            user1_items = json.loads(offer.Inventory1)
+            user2_items = json.loads(offer.Inventory2)
+            user1_name = offer.Username1
 
-    context = {
-        'sent': offers_sent,
-        'received': offers_received,
-        'name': request.user.username,
-    }
+            res.append({
+                'user1_items': user1_items,
+                'user2_items': user2_items,
+                'user1_name': user1_name,
+                'id': offer.pk,
+            })
+        
+        context = {
+            'offers': res,
+            'name': request.user.username,
+            'isadmin' : request.user.is_superuser,
+        }
+
+    else:
+        offers_sent = Offer.objects.filter(Username2=request.user.username)
+        offers_received = Offer.objects.filter(Username1=request.user.username)
+
+        sent_offers = []
+        received_offers = []
+
+        for offer in offers_sent:
+            user1_items = json.loads(offer.Inventory1)
+            user2_items = json.loads(offer.Inventory2)
+            user1_name = offer.Username1
+
+            sent_offers.append({
+                'user1_items': user1_items,
+                'user2_items': user2_items,
+                'user1_name': user1_name,
+                'id': offer.pk,
+            })
+
+        for offer in offers_received:
+            user1_items = json.loads(offer.Inventory1)
+            user2_items = json.loads(offer.Inventory2)
+            user2_name = offer.Username2
+
+            received_offers.append({    
+                'user1_items': user1_items,
+                'user2_items': user2_items,
+                'user2_name': user2_name,
+                'id': offer.pk,
+            })
+
+        context = {
+            'sent_offers': sent_offers,
+            'received_offers': received_offers,
+            'name': request.user.username,
+            'isadmin' : request.user.is_superuser,
+        }
 
     return render(request, "show_offers.html", context)
 
@@ -104,7 +157,8 @@ def delete_offer(request, id):
     if request.method == 'POST':
         offer = Offer.objects.get(id=id)
         offer.delete()
-    return redirect('/')
+        return JsonResponse({"message": "Successfully removed the Offer"}, status=200)
+    return JsonResponse({"message": "Invalid request method"}, status=400)
 
 @login_required(login_url='/authentication/login/')
 def accept_offer(request, id):
@@ -124,7 +178,7 @@ def accept_offer(request, id):
                 continue
             elif amount > inventory1.amount:
                 return JsonResponse({"message": "The requested amount exceeds available inventory"}, status=400)
-            inventory2 = Inventory.objects.get_or_create(user=user2, book=book, amount=0)[0]
+            inventory2 = Inventory.objects.get_or_create(user=user2, book=book, defaults={"amount": 0})[0]
             inventory1.amount -= amount
             inventory2.amount += amount
             inventories.append(inventory2)
@@ -141,7 +195,7 @@ def accept_offer(request, id):
                 continue
             elif amount > inventory2.amount:
                 return JsonResponse({"message": "The requested amount exceeds available inventory"}, status=400)
-            inventory1 = Inventory.objects.get_or_create(user=user1, book=book, amount=0)[0]
+            inventory1 = Inventory.objects.get_or_create(user=user1, book=book, defaults={"amount": 0})[0]
             inventory1.amount += amount
             inventory2.amount -= amount
             inventories.append(inventory1)
@@ -154,5 +208,5 @@ def accept_offer(request, id):
             inventory.save()
 
         offer.delete()
-        return JsonResponse({"message": "Offer accepted and processed"}, status=200)
+        return JsonResponse({"message": "Exchange successful. Your Inventory has been updated"}, status=200)
     return JsonResponse({"message": "Invalid request method"}, status=400)
