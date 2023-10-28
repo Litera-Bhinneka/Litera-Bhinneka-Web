@@ -19,20 +19,10 @@ def show_homepage(request):
         'last_login': request.COOKIES['last_login'],
         # 'last_feedback': request.session.get('last_feedback', 'Belum ada feedback yang diberikan'),
         'form':form,
+        'isadmin' : request.user.is_staff,
     }
 
     return render(request, "homepage.html", context)
-
-@staff_member_required(login_url='/authentication/login/')
-def admin_show_homepage(request):
-    form = FeedbackForm()
-    context = {
-        'name': request.user.username,
-        'last_login': request.COOKIES['last_login'],
-        'form':form,
-    }
-
-    return render(request, "admin_homepage.html", context)
 
 @login_required(login_url='/authentication/login/')
 def submit_feedback(request):
