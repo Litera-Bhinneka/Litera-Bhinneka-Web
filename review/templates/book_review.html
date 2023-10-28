@@ -26,9 +26,12 @@
             color: #fd4;
         }
         #book_image{
-            background-color: #dddddd;
+            background-color: #cad1da;
         }
         #card_review{
+            background-color: #dddddd;
+        }
+        #reviewFilter{
             background-color: #dddddd;
         }
         .custom-button {
@@ -276,9 +279,42 @@
             const reviews = await getReviews();
             const stars = ['1', '2', '3', '4', '5'];
             
-            let htmlString = '';
-            console.log(reviews)
+            let htmlString = '<div class="flex">';
+        
 
+            htmlString += `
+            <div class="w-1/5">
+                <div id="reviewFilter" class="sticky top-20 overflow-y-auto border-2 border-sky-500 rounded-lg p-4">
+                    <h2 class="pl-3 text-lg font-semibold mb-4"><b>Rating</b></h2>
+                    <div class="mb-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="fiveStar" onclick="filterItems()" class="mr-2"> 5 Star
+                        </label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="fourStar" onclick="filterItems()" class="mr-2"> 4 Star
+                        </label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="threeStar" onclick="filterItems()" class="mr-2"> 3 Star
+                        </label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="twoStar" onclick="filterItems()" class="mr-2"> 2 Star
+                        </label>
+                    </div>
+                    <div class="mb-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="oneStar" onclick="filterItems()" class="mr-2"> 1 Star
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="w-4/5">
+                `
             
             reviews.forEach((review, index) => {
                 let showText;
@@ -295,7 +331,6 @@
                 } else {
                     exceed = false;
                 }
-                console.log(review.fields.review_text.length)
                 let datetime = review.fields.review_date
                 let formattedDate = (new Date(datetime)).toLocaleDateString('en-GB', {
                                                                                 day: 'numeric',
@@ -307,12 +342,12 @@
                                                                             });
                 
                 htmlString += `
-                <div class="w-full p-4">
+                <div class="card-review${review.fields.review_score} w-full p-4">
                     <div id="card_review" class="bg-white shadow-lg rounded-lg overflow-hidden">
-                        <div class="px-6 py-4">
+                        <div class="px-6 pt-4">
                             <div class="font-bold text-xl mb-2">${review.fields.reviewer_name}</div>
 
-                            <div class="mb-4 flex items-center">
+                            <div class="flex items-center">
                             <!-- display rating in star component -->
                                 <div class="flex space-x-1">
                                     <div class="star-rating-review" title="${review.fields.review_score*20}%">
@@ -333,20 +368,22 @@
                                         </div>
                                     </div>  
                                 </div>
-                                <span class="ml-2"><b>${review.fields.review_summary}</b></span>
                             </div>
+                            <span class="my-2"><b>${review.fields.review_summary}</b></span>
                             <div class="mb-4">
                                 <p class="text-gray-700 text-base">${exceed ? showText + `<span class="text-gray-700 text-base" id="dots${index}">` + `<span id="realDots${index}">...</span>`+ `<button onclick="readMore(${index})" id="readMoreBtn${index}" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Read More</button>` +`<span class="text-gray-700 text-base" id="more${index}" style="display: none;">${hiddenText}</span>` + `</span>` : review.fields.review_text}</p>
                                 ${exceed ? `<button onclick="readMore(${index})" id="readLessBtn${index}" class="text-blue-500 hover:text-blue-700 text-sm font-medium" style="display: none;">Read less</button>` : ''}
                             </div>
 
                         </div>
-                        <div class="px-6 py-4">
+                        <div class="px-6 pb-6">
                             <span class="text-gray-600 text-sm">${formattedDate}</span>
                         </div>
                     </div>
                 </div>`;
             });
+            htmlString += "</div> </div>"
+
             $(document).ready(function() {
                 var star_rating_width = $('.fill-ratings span').width();
                 $('.star-ratings').width(star_rating_width);
@@ -399,6 +436,47 @@
                 
             }
         }
+        function filterItems() {
+            var rating5 = document.getElementsByClassName('card-review5 w-full p-4');
+            var rating4 = document.getElementsByClassName('card-review4 w-full p-4');
+            var rating3 = document.getElementsByClassName('card-review3 w-full p-4');
+            var rating2 = document.getElementsByClassName('card-review2 w-full p-4');
+            var rating1 = document.getElementsByClassName('card-review1 w-full p-4');
+
+            toggleDisplay(rating5, 'fiveStar');
+            toggleDisplay(rating4, 'fourStar');
+            toggleDisplay(rating3, 'threeStar');
+            toggleDisplay(rating2, 'twoStar');
+            toggleDisplay(rating1, 'oneStar');
+        }
+
+        function toggleDisplay(elements, checkboxId) {
+            var allUnchecked = true;
+
+            // Check if any checkbox is checked
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox.checked) {
+                    allUnchecked = false;
+                }
+            });
+
+            // If all checkboxes are unchecked, show all elements
+            if (allUnchecked) {
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].style.display = 'block';
+                }
+                return;
+            }
+
+            // If any checkbox is checked, apply individual display logic
+            var shouldHide = document.getElementById(checkboxId).checked;
+
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.display = shouldHide ? 'block' : 'none';
+            }
+        }
+
+        
         showBook()
         refreshReviews()
     </script>
