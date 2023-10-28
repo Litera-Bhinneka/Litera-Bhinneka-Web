@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from review.forms import ReviewForm
 from django.urls import reverse
 from django.core import serializers
+from review.forms import ReviewForm
 from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
@@ -25,6 +26,7 @@ def see_book_review(request, id):
         'book': book,
         'reviews': reviews,
         'name': request.user.username,
+        'form':ReviewForm({"review_score":"5"}),
         'stars': (1,2,3,4,5)
     }
 
@@ -63,7 +65,7 @@ def add_review_ajax(request, book_id1, book_id2):
         review_text = request.POST.get("review_text")
         review_summary = request.POST.get("review_summary")
         reviewer_name = request.user.username
-        rating = int(request.POST.get("rating"))
+        rating = int(request.POST.get("review_score"))
         book_title = get_object_or_404(Book, pk=book_id2).title
 
         new_review = Review(book_title=book_title,
