@@ -20,7 +20,7 @@
                             <div class="w-3/4 bg-white p-4 rounded-lg shadow-md ml-5">
                                 <label for="id_user1_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
                                 <label for="id_user1_item_quantities_{{ forloop.counter0 }}" class="block text-sm text-gray-600 mb-2">Select Amount</label>
-                                <select name="user1_item_quantities" id="id_user1_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
+                                <select name="user1_item_quantities" id="id_user1_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" data-booktitle="{{ item.book.title }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
                                 </select>
                             </div>
                         </div>
@@ -55,7 +55,7 @@
                             <div class="w-3/4 bg-white p-4 rounded-lg shadow-md ml-5">
                                 <label for="id_user2_item_quantities_{{ forloop.counter0 }}" class="block text-lg font-semibold mb-2">{{ item.book.title }}</label>
                                 <label for="id_user2_item_quantities_{{ forloop.counter0 }}" class="block text-sm text-gray-600 mb-2">Select Amount</label>
-                                <select name="user2_item_quantities" id="id_user2_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
+                                <select name="user2_item_quantities" id="id_user2_item_quantities_{{ forloop.counter0 }}" data-bookid="{{ item.book.id }}" data-booktitle="{{ item.book.title }}" max_amount="{{ item.amount }}" class="border p-2 rounded-lg">
                                 </select>
                             </div>
                         </div>
@@ -145,9 +145,11 @@
         // Loop through select elements and add book ID and quantity to the form data
         $("select").each(function() {
             var bookId = $(this).data("bookid");
+            var bookTitle = $(this).data("booktitle");
             var quantity = $(this).val();
             form.append('book_ids', bookId);
             form.append('quantities', quantity);
+            form.append('book_titles', bookTitle);
         });
 
         fetch("{% url 'exchange:add_offer' %}", {

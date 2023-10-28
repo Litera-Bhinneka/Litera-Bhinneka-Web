@@ -83,24 +83,12 @@
             event.preventDefault();
             const searchQuery = bookSearch.value.trim();
             // Construct the search URL with the updated query
-            const baseURL = '/exchange/'; // Your base URL
+            const baseURL = '/exchange/'; // base URL
             const searchURL = `${baseURL}?q=${encodeURIComponent(searchQuery)}`;
             // Redirect to the new URL
             window.location.href = searchURL;
         });
     });
-
-    function search() {
-        const searchInput = document.getElementById('bookSearch');
-        const searchQuery = searchInput.value;
-        console.log(searchInput);
-        const baseURL = '/exchange/';
-
-        // Construct the search URL with the updated query
-        const searchURL = `${baseURL}?q=${encodeURIComponent(searchQuery)}`;
-        // Redirect to the new URL
-        window.location.href = searchURL;
-    }
 
     function closeModal() {
         $("#bookModal").hide();

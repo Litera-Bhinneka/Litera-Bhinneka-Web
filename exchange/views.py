@@ -52,7 +52,7 @@ def offer_user(request, username):
 
 
 def get_owners(request, id):
-    book = get_object_or_404(Book, id=id)  # Retrieve the book (assuming it's a single object)
+    book = get_object_or_404(Book, id=id)  # Retrieve the book
     # Exclude the user who made the request and filter users from inventories
     users = User.objects.exclude(username=request.user.username).filter(Q(inventory__book=book)).distinct()
     return HttpResponse(serializers.serialize("json", users))
@@ -65,11 +65,12 @@ def add_offer(request):
         user1_item_quantities = form_data.getlist('user1_item_quantities')
         user2_item_quantities = form_data.getlist('user2_item_quantities')
         book_ids = form_data.getlist('book_ids')  # Retrieve book IDs from the form data
+        book_titles = form_data.getlist('book_titles')  # Retrieve book Titles from the form data
 
-        # Combine book IDs and quantities into dictionaries
-        user1_inventory = [{'book_id': int(book_ids[i]), 'quantity': int(user1_item_quantities[i])}
+        # Combine book IDs, quantities, and titles into dictionaries
+        user1_inventory = [{'book_id': int(book_ids[i]), 'quantity': int(user1_item_quantities[i]), 'book_title': str(book_titles[i])}
                           for i in range(len(user1_item_quantities)) if int(user1_item_quantities[i]) > 0]
-        user2_inventory = [{'book_id': int(book_ids[i + len(user1_item_quantities)]), 'quantity': int(user2_item_quantities[i])}
+        user2_inventory = [{'book_id': int(book_ids[i + len(user1_item_quantities)]), 'quantity': int(user2_item_quantities[i]), 'book_title': str(book_titles[i + len(user1_item_quantities)])}
                           for i in range(len(user2_item_quantities)) if int(user2_item_quantities[i]) > 0]
 
         # Create an instance of the Offer model and populate its fields
@@ -100,20 +101,6 @@ def show_offers(request):
         user2_items = json.loads(offer.Inventory2)
         user1_name = offer.Username1
 
-        for item in user1_items:
-            try:
-                book = Book.objects.get(id=item['book_id'])
-                item['book_title'] = book.title
-            except Book.DoesNotExist:
-                item['book_title'] = 'Book not Found'
-
-        for item in user2_items:
-            try:
-                book = Book.objects.get(id=item['book_id'])
-                item['book_title'] = book.title
-            except Book.DoesNotExist:
-                item['book_title'] = 'Book not Found'
-
         sent_offers.append({
             'user1_items': user1_items,
             'user2_items': user2_items,
@@ -125,20 +112,6 @@ def show_offers(request):
         user1_items = json.loads(offer.Inventory1)
         user2_items = json.loads(offer.Inventory2)
         user2_name = offer.Username2
-
-        for item in user1_items:
-            try:
-                book = Book.objects.get(id=item['book_id'])
-                item['book_title'] = book.title
-            except Book.DoesNotExist:
-                item['book_title'] = 'Book not Found'
-
-        for item in user2_items:
-            try:
-                book = Book.objects.get(id=item['book_id'])
-                item['book_title'] = book.title
-            except Book.DoesNotExist:
-                item['book_title'] = 'Book not Found'
 
         received_offers.append({    
             'user1_items': user1_items,
