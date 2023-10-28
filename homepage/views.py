@@ -1,6 +1,7 @@
 import datetime
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponseRedirect, HttpResponseBadRequest, JsonResponse, HttpResponse
 from homepage.forms import FeedbackForm
 from django.urls import reverse
@@ -8,13 +9,13 @@ from homepage.forms import FeedbackForm
 from homepage.models import Feedback
 from django.core import serializers
 
+
 # Create your views here.
 @login_required(login_url='/authentication/login/')
 def show_homepage(request):
     form = FeedbackForm()
     context = {
         'name': request.user.username,
-        'class': 'PBP B',
         'last_login': request.COOKIES['last_login'],
         # 'last_feedback': request.session.get('last_feedback', 'Belum ada feedback yang diberikan'),
         'form':form,
@@ -22,6 +23,16 @@ def show_homepage(request):
 
     return render(request, "homepage.html", context)
 
+@staff_member_required(login_url='/authentication/login/')
+def admin_show_homepage(request):
+    form = FeedbackForm()
+    context = {
+        'name': request.user.username,
+        'last_login': request.COOKIES['last_login'],
+        'form':form,
+    }
+
+    return render(request, "admin_homepage.html", context)
 
 @login_required(login_url='/authentication/login/')
 def submit_feedback(request):

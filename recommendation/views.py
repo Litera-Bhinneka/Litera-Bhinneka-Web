@@ -8,8 +8,10 @@ from django.core import serializers
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required(login_url='/authentication/login/')
 def show_recommendation(request):
     recommendations = Recommendation.objects.all().values()
     context = {
@@ -31,8 +33,10 @@ def add_recommendation(request):
     context = {'form': form}
     return render(request, "add_recommendation.html", context)
 
+@login_required(login_url='/authentication/login/')
 @csrf_exempt
 def add_recommendation_ajax(request, bookId1, bookId2):
+    form = RecommendationForm(request.POST or None)
     if request.method == 'POST':
         recommender_name = request.user.username
         description = request.POST.get("description_text")
