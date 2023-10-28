@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'manage_user',
     'recommendation',
     'review',
-    'exchange'
+    'exchange',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
