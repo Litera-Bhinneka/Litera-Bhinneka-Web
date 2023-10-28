@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="m-4">
+    <a href="{% url 'homepage:show_homepage' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Back
+    </a>
+    
+    <a href="{% url 'exchange:show_offers' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        My Offers
+    </a>
+
+    <form id="form" method="get">
+        <input type="text" id="bookSearch" placeholder="Search for a book" class="m-4 p-2 rounded-lg border border-gray-300">
+        <input type="submit" value="Search" class="bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700">
+    </form>
+    
+    <div class="flex flex-wrap justify-center">
+        {% for book in books %}
+        <div class="max-w-sm m-4 bg-white rounded-lg shadow-md dark:bg-gray-800" style="width: 250px;">
+            <img class="w-32 h-48 object-cover rounded-t-lg" src="{{ book.image_link }}" alt="Book Image">
+            <div class="p-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark-text-gray-200">{{book.title}}</h2>
+                <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover-bg-blue-600 focus-ring-2 focus-ring-blue-400 focus-outline-none" onclick="openModal(this.getAttribute('data-book'))" data-book="{{book.id}}">
+                    See Owners
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-gray-500 text-lg my-4">No books found.</div>
+        {% endfor %}
+    </div>
+
+    <div id="bookModal" class="fixed inset-0 flex items-center justify-center z-10 hidden">
+        <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
+        <div class="modal-container bg-white w-1/2 md:w-2/3 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+            <div class="modal-content py-4 text-left px-6">
+                <div class="flex justify-between items-center pb-3">
+                    <p class="text-2xl font-bold">Book Owners</p>
+                    <button class="modal-close" onclick="closeModal()">
+                        <span class="text-2xl">&times;</span>
+                    </button>
+                </div>
+                <div id="owners">
+                </div>
+                <button onclick="closeModal()" class="bg-blue-500 hover-bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .owner-info {
+        display: flex;
+        justify-content: space between;
+        align-items: center;
+    }
+    .profile-image {
+        width: 48px; /* Adjust the width as needed */
+        height: 48px; /* Adjust the height as needed */
+        border-radius: 50%;
+        margin-right: 8px; /* Add spacing between image and username */
+    }
+    .send-offer-button {
+        background-color: #3498db; /* Background color for the button */
+        color: #fff; /* Text color for the button */
+        font-weight: bold;
+        padding: 8px 12px; /* Adjust padding as needed */
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('form');
+        const bookSearch = document.getElementById('bookSearch');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const searchQuery = bookSearch.value.trim();
+            // Construct the search URL with the updated query
+            const baseURL = '/exchange/'; // Your base URL
+            const searchURL = `${baseURL}?q=${encodeURIComponent(searchQuery)}`;
+            // Redirect to the new URL
+            window.location.href = searchURL;
+        });
+    });
+
+    function search() {
+        const searchInput = document.getElementById('bookSearch');
+        const searchQuery = searchInput.value;
+        console.log(searchInput);
+        const baseURL = '/exchange/';
+
+        // Construct the search URL with the updated query
+        const searchURL = `${baseURL}?q=${encodeURIComponent(searchQuery)}`;
+        // Redirect to the new URL
+        window.location.href = searchURL;
+    }
+
+    function closeModal() {
+        $("#bookModal").hide();
+    }
+
+    async function getOwners(book_id) {
+        return fetch("/exchange/get-owners/" + book_id + "/").then((res) => res.json())
+    }
+
+    async function openModal(book_id) {
+        const owners = await getOwners(book_id);
+
+        $("#owners").empty();
+        
+        if (owners.length === 0) {
+            // If there are no owners, display a message
+            const noOwnersMessage = document.createElement("p");
+            noOwnersMessage.textContent = "There are no users with this book";
+            $("#owners").append(noOwnersMessage);
+        } else {
+            // If there are owners, loop through and display them
+            owners.forEach(owner => {
+                const ownerUsername = owner.fields.username;
+
+                // Create a div to hold user information
+                const userDiv = document.createElement("div");
+                userDiv.className = "owner-info";
+
+                // Create an image element for the user's profile picture
+                const profileImage = document.createElement("img");
+                profileImage.src = "https://media.discordapp.net/attachments/1054028087551078452/1167449134421254194/def.png?ex=654e2abb&is=653bb5bb&hm=627c977e5a4ddfc7fde42bede685dd1430d9f8bd22a155811a9cc2f9e1c185cc&=&width=125&height=125";
+                profileImage.alt = "Profile Image";
+                profileImage.className = "profile-image";
+
+                // Create a button "Send Offer" for the user
+                const sendOfferButton = document.createElement("button");
+                sendOfferButton.textContent = "Send Offer";
+                sendOfferButton.className = "send-offer-button";
+                sendOfferButton.onclick = function () {
+                    window.location.href = "/exchange/offer-user/" + ownerUsername + "/";
+                };
+
+                // Append the profile image, the username, and the "Send Offer" button to the owner's div
+                userDiv.appendChild(profileImage);
+                userDiv.appendChild(document.createTextNode(ownerUsername));
+                userDiv.appendChild(sendOfferButton);
+
+                // Append the owner's div to the modal content
+                $("#owners").append(userDiv);
+            });
+        }
+
+        $("#bookModal").show();
+    }
+
+</script>
+{% endblock content %}

@@ -7,24 +7,25 @@ from catalog.models import Book
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 import json
 
 # Create your views here.
 @login_required(login_url='/authentication/login/')
-def show_users(request):
-    users = User.objects.exclude(username=request.user.username)
-    inventory_data = []
+def show_books(request):
+    search_query = request.GET.get('q', '')
 
-    for user in users:
-        inventory_items = Inventory.objects.filter(user=user)
-        inventory_data.append(inventory_items)
+    if search_query:
+        books = Book.objects.filter(Q(title__icontains=search_query)).values()
+    else:
+        books = Book.objects.all().values()
 
     context = {
-        'users': users.values(),
+        'books': books,
         'name': request.user.username,
     }
 
-    return render(request, "show_users.html", context)
+    return render(request, "show_owners.html", context)
 
 @login_required(login_url='/authentication/login/')
 def offer_user(request, username):
@@ -50,11 +51,11 @@ def offer_user(request, username):
     return render(request, 'offer_user.html', context)
 
 
-def get_books(request, username):
-    user = get_object_or_404(User, username=username)
-    inventory_items = Inventory.objects.filter(user=user)
-
-    return HttpResponse(serializers.serialize("json", inventory_items))
+def get_owners(request, id):
+    book = get_object_or_404(Book, id=id)  # Retrieve the book (assuming it's a single object)
+    # Exclude the user who made the request and filter users from inventories
+    users = User.objects.exclude(username=request.user.username).filter(Q(inventory__book=book)).distinct()
+    return HttpResponse(serializers.serialize("json", users))
 
 @csrf_exempt
 def add_offer(request):
@@ -67,9 +68,9 @@ def add_offer(request):
 
         # Combine book IDs and quantities into dictionaries
         user1_inventory = [{'book_id': int(book_ids[i]), 'quantity': int(user1_item_quantities[i])}
-                          for i in range(len(user1_item_quantities))]
+                          for i in range(len(user1_item_quantities)) if int(user1_item_quantities[i]) > 0]
         user2_inventory = [{'book_id': int(book_ids[i + len(user1_item_quantities)]), 'quantity': int(user2_item_quantities[i])}
-                          for i in range(len(user2_item_quantities))]
+                          for i in range(len(user2_item_quantities)) if int(user1_item_quantities[2]) > 0]
 
         # Create an instance of the Offer model and populate its fields
         offer = Offer(

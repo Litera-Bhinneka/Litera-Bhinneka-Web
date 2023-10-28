@@ -2,6 +2,9 @@
 
 {% block content %}
 <div class="p-4">
+    <a href="{% url 'exchange:show_books' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Back
+    </a><br><br>
     <h2 class="text-2xl font-bold mb-4">Offers Sent</h2>
     <ul class="space-y-4">
         {% for offer in sent %}
