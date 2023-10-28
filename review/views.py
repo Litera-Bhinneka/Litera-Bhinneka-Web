@@ -61,6 +61,7 @@ def add_review_ajax(request, book_id1, book_id2):
         print(request.POST)
         print(request.POST.get("rating"))
         review_text = request.POST.get("review_text")
+        review_summary = request.POST.get("review_summary")
         reviewer_name = request.user.username
         rating = int(request.POST.get("rating"))
         book_title = get_object_or_404(Book, pk=book_id2).title
@@ -68,7 +69,7 @@ def add_review_ajax(request, book_id1, book_id2):
         new_review = Review(book_title=book_title,
                              reviewer_name=reviewer_name, 
                              review_score=rating,
-                             review_summary="",
+                             review_summary=review_summary,
                              review_text=review_text)
         new_review.save()
 
