@@ -1,0 +1,32 @@
+.custom-button {
+    /* bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700 */
+    color: White;
+    background-image: linear-gradient(to bottom right, #68D391, #4299E1);
+    transition: background-image 0.3s, box-shadow 0.3s;
+    border-radius: 9999px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    font-family: "Dosis", bold;
+    padding: 2px;
+    text-align: center;
+    margin-top: 1rem;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    width: 120px; /* Set the width to make the button wider */
+    height: 40px; /* Set the height to make the button taller */
+}
+
+.custom-button:hover {
+    background-image: linear-gradient(to bottom left, #8E24AA, #4299E1);
+    box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.1);
+}
+
+.custom-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.2);
+}
+
+.custom-button:focus {
+    box-shadow: 0 0 0 4px rgba(45, 148, 72, 0.2);
+}

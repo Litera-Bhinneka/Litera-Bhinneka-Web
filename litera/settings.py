@@ -143,8 +143,12 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 
-STATIC_URL = 'static/'
+# Set the STATIC_URL to define the URL for static files
+STATIC_URL = '/static/'
+
+# Set the STATICFILES_DIRS to specify additional directories for static files
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]

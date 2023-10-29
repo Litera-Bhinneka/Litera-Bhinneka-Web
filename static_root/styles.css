@@ -1,0 +1,10 @@
+.bg-custom-navy {
+    background-color: #073B3A
+    }
+body {
+    background-color: #cad1da;
+}
+nav{
+    position: sticky;
+    top: 0;
+}
