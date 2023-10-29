@@ -8,6 +8,7 @@ from django.urls import reverse
 from homepage.forms import FeedbackForm
 from homepage.models import Feedback
 from django.core import serializers
+from catalog.management.commands.load_book_data import Command
 
 
 # Create your views here.
@@ -21,7 +22,7 @@ def show_homepage(request):
         'form':form,
         'isadmin' : request.user.is_staff,
     }
-
+    Command().handle()
     return render(request, "homepage.html", context)
 
 @login_required(login_url='/authentication/login/')

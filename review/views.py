@@ -26,7 +26,7 @@ def see_book_review(request, id):
         'book': book,
         'reviews': reviews,
         'name': request.user.username,
-        'form':ReviewForm({"review_score":"5"}),
+        'form':ReviewForm,
         'stars': (1,2,3,4,5)
     }
 

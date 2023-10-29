@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.http import HttpResponse
 from django.core import serializers
 from django.db.models import Q
+from review.management.commands.load_rating_data import Command
 
 
 # Create your views here.
@@ -14,6 +15,7 @@ def show_catalog(request):
         'books': books,
         'name': request.user.username,
     }
+    Command().handle()
 
     return render(request, "show_catalog.html", context)
 

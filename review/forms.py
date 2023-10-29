@@ -21,7 +21,6 @@ class ReviewForm(ModelForm):
         review_score = forms.ChoiceField(
             choices=RATING_CHOICES,
             widget=forms.RadioSelect(attrs={'class': 'hidden'}),
-            initial='5',
             required=True,
         )
         
