@@ -1,69 +1,95 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-    <div class="flex items-center mb-4">
+<div class="flex items-center mb-4">
+    <a href="{% url 'manage_user:show_inventory' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Back
+    </a>
+    <a>
         <input type="text" id="searchInput" class="bg-gray-100 border border-gray-300 rounded-lg py-2 px-4 mr-2 focus:outline-none focus:ring focus:border-blue-500" placeholder="Search...">
-        <button id="searchButton" class="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring focus:border-blue-500">Search</button>
-    </div>
+        <button id="searchButton" class="bg-blue-500 hover-bg-blue-700 text-white font-medium py-2 px-4 rounded-lg focus:outline-none focus:ring focus:border-blue-500">Search</button>
+    </a>
+</div>
 
-    <table id="searchResults"></div>
+<table id="searchResults"></div>
 
-    {% csrf_token %}
+{% csrf_token %}
 
-    <script>
-        async function getBooks() {
-            return fetch("{% url 'manage_user:get_book_json' %}").then((res) => res.json())
-        }
-        async function init() {
-            const books = await getBooks();
-            console.log(books);
+<script>
+    async function getBooks() {
+        return fetch("{% url 'manage_user:get_book_json' %}").then((res) => res.json())
+    }
+    
+    async function init() {
+        const books = await getBooks();
+        console.log(books);
 
-            const searchButton = document.getElementById("searchButton");
-            const searchInput = document.getElementById("searchInput");
+        const searchButton = document.getElementById("searchButton");
+        const searchInput = document.getElementById("searchInput");
+        const searchResultsContainer = document.getElementById("searchResults");
+
+        searchButton.addEventListener("click", async function() {
+            const searchKeyword = searchInput.value.toLowerCase();
+            const filteredBooks = books.filter(book => book.fields.title.toLowerCase().includes(searchKeyword));
+            displaySearchResults(filteredBooks);
+        });
+
+        function displaySearchResults(results) {
             const searchResultsContainer = document.getElementById("searchResults");
 
-            searchButton.addEventListener("click", async function() {
-                const searchKeyword = searchInput.value.toLowerCase();
-                const filteredBooks = books.filter(book => book.fields.title.toLowerCase().includes(searchKeyword));
-                displaySearchResults(filteredBooks);
-            });
-
-            function displaySearchResults(results) {
-                const searchResultsContainer = document.getElementById("searchResults");
-                
-                searchResultsContainer.innerHTML = ""; // Clear previous results
-                if (results.length === 0) {
-                    searchResultsContainer.textContent = "No matching books found.";
-                } else {
-                    let htmlString = `<tr>
-                                        <th>Book Cover</th>
-                                        <th>Book Title</th>
-                                        <th>Add Button</th>
-                                    </tr>`;
-                    results.forEach(book => {
-                            htmlString += `\n<tr>
-                                    <td><img src="${book.fields.image_link}" alt="book cover"></td>
-                                    <td>${book.fields.title}</td>
-                                    <td>
-                                        <button onclick="incrementBook(event, ${book.pk})" class="bg-green-500 hover:bg-green-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:border-green-300">
-                                            Add book to my inventory
-                                        </button>
-                                    </td>
-                                </tr>`;
-                    });
-                    searchResultsContainer.innerHTML = htmlString;
-                }
+            searchResultsContainer.innerHTML = ""; // Clear previous results
+            if (results.length === 0) {
+                searchResultsContainer.textContent = "No matching books found.";
+            } else {
+                let htmlString = `<tr>
+                                <th>Book Cover</th>
+                                <th>Book Title</th>
+                                <th>Add Button</th>
+                            </tr>`;
+                results.forEach(book => {
+                    htmlString += `\n<tr>
+                            <td><img src="${book.fields.image_link}" alt="book cover"></td>
+                            <td>${book.fields.title}</td>
+                            <td>
+                                <button onclick="incrementBook(event, ${book.pk})" class="bg-green-500 hover-bg-green-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring focus:border-green-300">
+                                    Add book to my inventory
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+                searchResultsContainer.innerHTML = htmlString;
             }
         }
-        function incrementBook(event, id) {
-            event.preventDefault();
-            fetch("increment-book-ajax/" + id + "/", {
-                method: "POST"
-            })
-        }
+    }
 
-        init();
-    </script>
+    function incrementBook(event, id) {
+        event.preventDefault();
+        console.log("Incrementing book:", id); // Add this line for debugging
+        fetch("increment-book-ajax/" + id + "/", {
+            method: "POST"
+                }).then(response => {
+            if (response.ok) {
+                // Jika request berhasil, tampilkan pesan pop-up
+                showAlert("Berhasil menambahkan ke inventory");
+                const quantityElement = document.getElementById(`quantity-${id}`);
+                 if (quantityElement) {
+                    const currentQuantity = parseInt(quantityElement.textContent.split(' ')[1]);
+                    quantityElement.textContent = `Quantity: ${currentQuantity + 1}`
+                 }
+            } else {
+            // Jika request gagal, tampilkan pesan error
+            showAlert("Gagal menambahkan ke inventory");
+            }
 
-  {% endblock content %}
+        });
+    }
+
+    // Fungsi untuk menampilkan pesan pop-up
+    function showAlert(message) {
+        alert(message);
+    }
+
+    init();
+</script>
+
+{% endblock content %}
