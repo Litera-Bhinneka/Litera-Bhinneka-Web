@@ -1,5 +1,5 @@
 from django.urls import path
-from exchange.views import show_books, offer_user, get_owners, add_offer, show_offers, delete_offer, accept_offer
+from exchange.views import show_books, offer_user, get_owners, add_offer, show_offers, delete_offer, accept_offer, schedule_meet
 
 app_name = 'exchange'
 
@@ -11,4 +11,5 @@ urlpatterns = [
     path('show-offers/', show_offers, name='show_offers'),
     path('delete-offer/<int:id>/', delete_offer, name='delete_offer'),
     path('accept-offer/<int:id>/', accept_offer, name='accept_offer'),
+    path('schedule-meet/<int:id>/', schedule_meet, name='schedule_meet'),
 ]

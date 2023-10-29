@@ -91,6 +91,7 @@
         <span id="successModalClose" class="absolute top-0 right-0 m-4 text-gray-600 cursor-pointer">&times;</span>
         <p class="text-lg font-semibold mb-2 text-center">Offer successfully sent!</p>
         <button id="successModalOK" class="block mx-auto bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-700">OK</button>
+        <button id="scheduleMeetingButton" class="block mx-auto bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700">Schedule a Meeting</button>
     </div>
 </div>
 
@@ -115,8 +116,13 @@
     var failedModalOK = document.getElementById("failedModalOK");
 
     // Function to open the success modal
-    function openSuccessModal() {
+    function openSuccessModal(id) {
         successModal.classList.remove("hidden");
+
+        document.getElementById("scheduleMeetingButton").addEventListener("click", function () {
+            // Redirect to the meeting page with the specified id
+            window.location.href = `/exchange/schedule-meet/${id}/`; // Adjust the URL pattern as needed
+        });
     }
 
     // Function to open the failed modal
@@ -157,7 +163,10 @@
             body: form
         }).then(response => {
             if (response.ok) {
-                openSuccessModal();
+                response.json().then(data => {
+                console.log(data);
+                openSuccessModal(data.id);
+                });
             } else {
                 openFailedModal();
             }

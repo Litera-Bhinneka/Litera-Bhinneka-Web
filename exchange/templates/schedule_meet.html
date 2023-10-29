@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="p-4 flex items-center justify-center h-screen">
+    <div class="w-full max-w-sm bg-gray-100 p-4 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-4 text-center">Schedule an Offline Meeting</h2>
+        <form id="scheduleMeetForm" method="POST" action="/exchange/schedule-meet/{{id}}/">
+            {% csrf_token %}
+            <div class="mb-4">
+                {{ form.as_p }}
+            </div>
+            <div class="text-center">
+                <input type="submit" value="Schedule Meet" class="bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700">
+            </div>
+        </form>
+    </div>
+</div>
+<div id="Modal" class="fixed inset-0 flex items-center justify-center z-10 hidden">
+    <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
+    <div class="modal-container bg-white w-1/2 md:w-2/3 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+        <span id="ModalClose" class="absolute top-0 right-0 m-4 text-gray-600 cursor-pointer">&times;</span>
+        <p class="text-lg font-semibold mb-2 text-center"></p>
+        <button id="successModalOK" class="block mx-auto bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-700">OK</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("scheduleMeetForm");
+    const modal = document.getElementById("Modal");
+    const modalMessage = document.querySelector("#Modal .text-center");
+    const modalOKButton = document.getElementById("successModalOK");
+    const modalCloseButton = document.getElementById("ModalClose");
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        fetch("/exchange/schedule-meet/{{ id }}/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}", // Include the CSRF token
+            },
+            body: new FormData(form), // Use FormData to send form data
+        })
+        .then(response => {
+            if (response.ok) {
+                form.reset();
+            }
+            return response.json();
+        }) // Handle the response as needed
+        .then(data => {
+            if (data.message) {
+                // Display the modal with the response message
+                modalMessage.textContent = data.message;
+                modal.classList.remove("hidden");
+            } else {
+                modalMessage.textContent = "Oops, something went wrong!";
+                modal.classList.remove("hidden");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    });
+    // Add an event listener to the modal's OK button to hide the modal
+    modalOKButton.addEventListener("click", function () {
+        modal.classList.add("hidden");
+        window.location.href = "{% url 'exchange:show_offers' %}";
+    });
+
+    modalCloseButton.addEventListener("click", function () {
+        modal.classList.add("hidden");
+        window.location.href = "{% url 'exchange:show_offers' %}";
+    });
+});
+</script>
+{% endblock content %}

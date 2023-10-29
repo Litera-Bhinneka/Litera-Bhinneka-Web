@@ -1,11 +1,13 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from manage_user.models import Inventory
-from exchange.models import Offer
+from exchange.models import Offer, Meet
+from exchange.forms import MeetForm
 from catalog.models import Book
 from django.core import serializers
-from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 import json
@@ -33,6 +35,7 @@ def offer_user(request, username):
     user = get_object_or_404(User, username=username)
     inventory_items1 = Inventory.objects.filter(user=user)
     inventory_items2 = Inventory.objects.filter(user=request.user)
+
     context1 = {
         'user': user,
         'inventory_items': inventory_items1,
@@ -85,7 +88,7 @@ def add_offer(request):
         # Save the offer to the database
         offer.save()
 
-        return JsonResponse({"message": "CREATED"}, status=201)
+        return JsonResponse({"message": "CREATED", "id" : offer.pk}, status=201)
 
     return JsonResponse({"message": "Not Found"}, status=404)
 
@@ -98,12 +101,18 @@ def show_offers(request):
             user1_items = json.loads(offer.Inventory1)
             user2_items = json.loads(offer.Inventory2)
             user1_name = offer.Username1
+            meet = Meet.objects.filter(offer=offer)
+            if (len(meet) > 0):
+                meet = meet[0]
+            else:
+                meet = False
 
             res.append({
                 'user1_items': user1_items,
                 'user2_items': user2_items,
                 'user1_name': user1_name,
                 'id': offer.pk,
+                'meet': meet,
             })
         
         context = {
@@ -123,24 +132,36 @@ def show_offers(request):
             user1_items = json.loads(offer.Inventory1)
             user2_items = json.loads(offer.Inventory2)
             user1_name = offer.Username1
+            meet = Meet.objects.filter(offer=offer)
+            if (len(meet) > 0):
+                meet = meet[0]
+            else:
+                meet = False
 
             sent_offers.append({
                 'user1_items': user1_items,
                 'user2_items': user2_items,
                 'user1_name': user1_name,
                 'id': offer.pk,
+                'meet': meet,
             })
 
         for offer in offers_received:
             user1_items = json.loads(offer.Inventory1)
             user2_items = json.loads(offer.Inventory2)
             user2_name = offer.Username2
+            meet = Meet.objects.filter(offer=offer)
+            if (len(meet) > 0):
+                meet = meet[0]
+            else:
+                meet = False
 
             received_offers.append({    
                 'user1_items': user1_items,
                 'user2_items': user2_items,
                 'user2_name': user2_name,
                 'id': offer.pk,
+                'meet': meet,
             })
 
         context = {
@@ -171,9 +192,16 @@ def accept_offer(request, id):
         inventories = []
         
         for item in inventory1_data:
-            book = get_object_or_404(Book, id=item['book_id'])
-            amount = item['quantity']
-            inventory1 = get_object_or_404(Inventory, book=book, user=user1)
+            try:
+                book = Book.objects.get(id=item['book_id'])
+                inventory1 = Inventory.objects.get(book=book, user=user1)
+                amount = item['quantity']
+            except Book.DoesNotExist:
+                offer.delete()
+                return JsonResponse({"message": "The specified book is not found."}, status=400)
+            except Inventory.DoesNotExist:
+                offer.delete()
+                return JsonResponse({"message": "Inventory not found for the specified book and user."}, status=400)
             if amount == 0:
                 continue
             elif amount > inventory1.amount:
@@ -188,9 +216,16 @@ def accept_offer(request, id):
                 inventories.append(inventory1)
         
         for item in inventory2_data:
-            book = get_object_or_404(Book, id=item['book_id'])
-            amount = item['quantity']
-            inventory2 = get_object_or_404(Inventory, book=book, user=user2)
+            try:
+                book = Book.objects.get(id=item['book_id'])
+                inventory2 = Inventory.objects.get(book=book, user=user2)
+                amount = item['quantity']
+            except Book.DoesNotExist:
+                offer.delete()
+                return JsonResponse({"message": "The specified book is not found."}, status=400)
+            except Inventory.DoesNotExist:
+                offer.delete()
+                return JsonResponse({"message": "Inventory not found for the specified book and user."}, status=400)
             if amount == 0:
                 continue
             elif amount > inventory2.amount:
@@ -210,3 +245,26 @@ def accept_offer(request, id):
         offer.delete()
         return JsonResponse({"message": "Exchange successful. Your Inventory has been updated"}, status=200)
     return JsonResponse({"message": "Invalid request method"}, status=400)
+
+@login_required(login_url='/authentication/login/')
+def schedule_meet(request, id):
+    if request.method == 'POST':
+        form = MeetForm(request.POST)
+
+        if form.is_valid():
+            meet = form.save(commit=False)
+            meet.sender = request.user
+            meet.offer = Offer.objects.get(id=id)
+            meet.receiver = User.objects.get(username=meet.offer.Username1)
+            meet.save()
+            return JsonResponse({"message": "Successfully Scheduled an Offline Meeting"}, status=201)
+        else:
+            return JsonResponse({"message": "Form is not valid!"}, status=400)
+    else:
+        form = MeetForm()
+        context = {
+            'name': request.user.username,
+            'form': form,
+            'id': id,
+        }
+    return render(request, "schedule_meet.html", context)
