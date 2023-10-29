@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 
+{% load widget_tweaks %}
+
+
 {% block content %}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
     <link rel="stylesheet" href="styles.css">
@@ -100,7 +103,7 @@
         .star-rating {
             display: flex;
             align-items: center;
-            font-size: 24px;
+            font-size: 22px;
             justify-content: center;
         }
         .star-rating-review {
@@ -132,7 +135,7 @@
         </div>
 
         <!-- Display reviews in a table -->
-        <div id="review_container" class="mx-12 flex flex-wrap">
+        <div id="review_container" class="mx-12">
 
         </div>
         
@@ -148,36 +151,39 @@
                 </button>
                 <div class="px-6 py-6 lg:px-8">
                     <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Share your thought about this book</h3>
-                    <form class="space-y-6" id="form" onsubmit="return false;">
+                    <form class="space-y-3" id="form" onsubmit="return false;">
                         {% csrf_token %}
                         <div>
                             <label for="review_summary" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Review Summary</label>
-                            <textarea name="review_summary" id="review_summary" rows="1" class="resize-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-800 focus:border-green-800 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="My new FAVORITE COOKBOOK!" required></textarea>
+                            {{ form.review_summary }}
                         </div>
                         <div>
                             <label for="review" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your Review</label>
-                            <textarea name="review_text" id="review" rows="6" class="resize-none bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-800 focus:border-green-800 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="I recently found out I have numerous food allergies and sensitivities - this cookbook is definitely my new favorite! Not only are there TONS of delicious REAL FOOD recipes - they don't seem to be super complicated or time consuming!" required></textarea>
+                            {{ form.review_text }}
                         </div>
-                        <div class="rating-css flex justify-center items-center">
+                        <div class="mt-4 mx-4 rating-css flex justify-center items-center">
                             <div class="star-widget">
-                                <input type="radio" name="rating" id="rating1" class="hidden" value="5" checked required>
+                                {% render_field form.review_score name="rating" id="rating1" class="hidden" type="radio" value="5" %}
                                 <label for="rating1" class="fas fa-star cursor-pointer"></label>
                             
-                                <input type="radio" name="rating" id="rating2" class="hidden" value="4">
+                                {% render_field form.review_score name="rating" id="rating2" class="hidden" type="radio" value="4" %}
                                 <label for="rating2" class="fas fa-star cursor-pointer"></label>
                             
-                                <input type="radio" name="rating" id="rating3" class="hidden" value="3">
+                                {% render_field form.review_score name="rating" id="rating3" class="hidden" type="radio" value="3" %}
                                 <label for="rating3" class="fas fa-star cursor-pointer"></label>
                             
-                                <input type="radio" name="rating" id="rating4" class="hidden" value="2">
+                                {% render_field form.review_score name="rating" id="rating4" class="hidden" type="radio" value="2" %}
                                 <label for="rating4" class="fas fa-star cursor-pointer"></label>
                             
-                                <input type="radio" name="rating" id="rating5" class="hidden" value="1">
+                                {% render_field form.review_score name="rating" id="rating5" class="hidden" type="radio" value="1" %}
                                 <label for="rating5" class="fas fa-star cursor-pointer"></label>
 
                             </div>
                         </div>
-                        <button id="btn_submit" type="submit" onclick="addReview('{{ book.id }}')" class="w-full text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Post</button>
+                        <div class="flex items-center justify-center">
+                            <div><span class="text-sm font-medium text-gray-900 dark:text-white" style="color: transparent;user-select: none;" id="ratingAlert">Please rate the book</span></div>
+                          </div>
+                        <button id="btn_submit" type="submit" onclick="addReview('{{ book.id }}')" class="mt-4 w-full text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Post</button>
                     </form>
                 </div>
             </div>
@@ -250,7 +256,7 @@
                                     <i class="fas fa-star" aria-hidden="true"></i>
                                 </div>
                             </div>
-                        </div>   
+                        </div>
                         <span class="ml-2">(${reviews.length} ${messageRating})</span>
                     </div>
                     <div class="mb-4">
@@ -283,9 +289,9 @@
         
 
             htmlString += `
-            <div class="w-1/5">
+            <div class="lg:w-1/5 pt-4 md:w1/4 pt-4">
                 <div id="reviewFilter" class="sticky top-20 overflow-y-auto border-2 border-sky-500 rounded-lg p-4">
-                    <h2 class="pl-3 text-lg font-semibold mb-4"><b>Rating</b></h2>
+                    <h2 class="text-lg font-semibold mb-4"><b>Rating</b></h2>
                     <div class="mb-2">
                         <label class="flex items-center">
                             <input type="checkbox" id="fiveStar" onclick="filterItems()" class="mr-2"> 5 Star
@@ -315,74 +321,86 @@
             </div>
             <div class="w-4/5">
                 `
-            
-            reviews.forEach((review, index) => {
-                let showText;
-                let hiddenText;
-                let exceed;
-                if (review.fields.review_text.length > 250) {
-                    exceed = true;
-                    let reversedSubstring = review.fields.review_text.substring(250).split('').reverse().join(''); 
-                    let spaceIndex = reversedSubstring.indexOf(" "); 
+            if (reviews.length !== 0) {
+                reviews.forEach((review, index) => {
+                    let showText;
+                    let hiddenText;
+                    let exceed;
+                    if (review.fields.review_text.length > 250) {
+                        exceed = true;
+                        let reversedSubstring = review.fields.review_text.substring(250).split('').reverse().join(''); 
+                        let spaceIndex = reversedSubstring.indexOf(" "); 
 
-                    let sepIdx = spaceIndex !== -1 ? 250 - spaceIndex : 0; 
-                    showText = review.fields.review_text.substring(0, sepIdx);
-                    hiddenText = review.fields.review_text.substring(sepIdx, review.fields.review_text.length);
-                } else {
-                    exceed = false;
-                }
-                let datetime = review.fields.review_date
-                let formattedDate = (new Date(datetime)).toLocaleDateString('en-GB', {
-                                                                                day: 'numeric',
-                                                                                month: 'long',
-                                                                                year: 'numeric',
-                                                                                hour: 'numeric',
-                                                                                minute: 'numeric',
-                                                                                hour12: true,
-                                                                            });
-                
-                htmlString += `
-                <div class="card-review${review.fields.review_score} w-full p-4">
-                    <div id="card_review" class="bg-white shadow-lg rounded-lg overflow-hidden">
-                        <div class="px-6 pt-4">
-                            <div class="font-bold text-xl mb-2">${review.fields.reviewer_name}</div>
+                        let sepIdx = spaceIndex !== -1 ? 250 - spaceIndex : 0; 
+                        showText = review.fields.review_text.substring(0, sepIdx);
+                        hiddenText = review.fields.review_text.substring(sepIdx, review.fields.review_text.length);
+                    } else {
+                        exceed = false;
+                    }
+                    let datetime = review.fields.review_date
+                    let formattedDate = (new Date(datetime)).toLocaleDateString('en-GB', {
+                                                                                    day: 'numeric',
+                                                                                    month: 'long',
+                                                                                    year: 'numeric',
+                                                                                    hour: 'numeric',
+                                                                                    minute: 'numeric',
+                                                                                    hour12: true,
+                                                                                });
+                    
+                    htmlString += `
+                    <div class="card-review${review.fields.review_score} w-full p-4">
+                        <div id="card_review" class="bg-white border-2 border-sky-500 rounded-lg overflow-hidden">
+                            <div class="px-6 pt-4">
+                                <div class="font-bold text-xl mb-2">${review.fields.reviewer_name}</div>
 
-                            <div class="flex items-center">
-                            <!-- display rating in star component -->
-                                <div class="flex space-x-1">
-                                    <div class="star-rating-review" title="${review.fields.review_score*20}%">
-                                        <div class="back-stars">
-                                            <i class="fas fa-star" aria-hidden="true"></i>
-                                            <i class="fas fa-star" aria-hidden="true"></i>
-                                            <i class="fas fa-star" aria-hidden="true"></i>
-                                            <i class="fas fa-star" aria-hidden="true"></i>
-                                            <i class="fas fa-star" aria-hidden="true"></i>
-                                            
-                                            <div class="front-stars" style="width: ${review.fields.review_score*20}%">
+                                <div class="flex items-center">
+                                <!-- display rating in star component -->
+                                    <div class="flex space-x-1">
+                                        <div class="star-rating-review" title="${review.fields.review_score*20}%">
+                                            <div class="back-stars">
                                                 <i class="fas fa-star" aria-hidden="true"></i>
                                                 <i class="fas fa-star" aria-hidden="true"></i>
                                                 <i class="fas fa-star" aria-hidden="true"></i>
                                                 <i class="fas fa-star" aria-hidden="true"></i>
                                                 <i class="fas fa-star" aria-hidden="true"></i>
+                                                
+                                                <div class="front-stars" style="width: ${review.fields.review_score*20}%">
+                                                    <i class="fas fa-star" aria-hidden="true"></i>
+                                                    <i class="fas fa-star" aria-hidden="true"></i>
+                                                    <i class="fas fa-star" aria-hidden="true"></i>
+                                                    <i class="fas fa-star" aria-hidden="true"></i>
+                                                    <i class="fas fa-star" aria-hidden="true"></i>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>  
+                                        </div>  
+                                    </div>
                                 </div>
-                            </div>
-                            <span class="my-2"><b>${review.fields.review_summary}</b></span>
-                            <div class="mb-4">
-                                <p class="text-gray-700 text-base">${exceed ? showText + `<span class="text-gray-700 text-base" id="dots${index}">` + `<span id="realDots${index}">...</span>`+ `<button onclick="readMore(${index})" id="readMoreBtn${index}" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Read More</button>` +`<span class="text-gray-700 text-base" id="more${index}" style="display: none;">${hiddenText}</span>` + `</span>` : review.fields.review_text}</p>
-                                ${exceed ? `<button onclick="readMore(${index})" id="readLessBtn${index}" class="text-blue-500 hover:text-blue-700 text-sm font-medium" style="display: none;">Read less</button>` : ''}
-                            </div>
+                                <span class="my-2"><b>${review.fields.review_summary}</b></span>
+                                <div class="mb-4">
+                                    <p class="text-gray-700 text-base">${exceed ? showText + `<span class="text-gray-700 text-base" id="dots${index}">` + `<span id="realDots${index}">...</span>`+ `<button onclick="readMore(${index})" id="readMoreBtn${index}" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Read More</button>` +`<span class="text-gray-700 text-base" id="more${index}" style="display: none;">${hiddenText}</span>` + `</span>` : review.fields.review_text}</p>
+                                    ${exceed ? `<button onclick="readMore(${index})" id="readLessBtn${index}" class="text-blue-500 hover:text-blue-700 text-sm font-medium" style="display: none;">Read less</button>` : ''}
+                                </div>
 
+                            </div>
+                            <div class="px-6 pb-6">
+                                <span class="text-gray-600 text-sm">${formattedDate}</span>
+                            </div>
                         </div>
-                        <div class="px-6 pb-6">
-                            <span class="text-gray-600 text-sm">${formattedDate}</span>
+                    </div>`;
+                });
+                htmlString += "</div> </div>"
+            }else{
+                htmlString = `
+                <div class="card-review6 w-full p-4">
+                    <div id="card_review" class="bg-white border-2 border-sky-500 rounded-lg overflow-hidden">
+                        <div class="card text-center">
+                            <div class="card-text flex items-center justify-center mb-1">
+                                No reviews yet, be the first to review!
+                            </div>
                         </div>
                     </div>
                 </div>`;
-            });
-            htmlString += "</div> </div>"
+            }
 
             $(document).ready(function() {
                 var star_rating_width = $('.fill-ratings span').width();
@@ -393,11 +411,33 @@
         }
 
         function addReview(book_id) {
+            var reviewText = document.getElementById('review').value;
+            var reviewSummary = document.getElementById('review_summary').value;
+            var reviewScore = document.querySelector('input[name="review_score"]:checked');
+            var alertRating = document.getElementById("ratingAlert");
+
+            // Validate review_text, review_summary, and review_score
+            if (!reviewText.trim() || !reviewSummary.trim()) {
+                return false;
+            }
+
+            if (!reviewScore) {
+                alertRating.style.color = "";
+                alertRating.style.userSelect = "";
+                setTimeout(function() {
+                    alertRating.style.color = "transparent";
+                    alertRating.style.userSelect = "none";
+                }, 5000); // 5000 milliseconds = 5 seconds
+                return false;
+            }
+
             fetch("add-review-ajax/" + book_id + "/", {
                 method: "POST",
                 body: new FormData(document.querySelector('#form'))
             }).then(refreshReviews)
             closeModal()
+
+            // alertRating.style.display = "none";
 
             document.getElementById("form").reset()
             return false
