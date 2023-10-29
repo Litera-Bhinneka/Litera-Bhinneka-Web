@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="m-4">
+    <a href="{% url 'manage_user:user_page' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Back
+    </a>
+
+    {% if isadmin %}
+    <a href="{% url 'admin:index' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+        Admin
+    </a>
+    {% endif %}
+
+    <h2 class="text-2xl font-bold my-4">Your Wishlist</h2>
+    <div class="flex flex-wrap justify-center" id="wishlist-container">
+        <!-- Wishlist items will be displayed here -->
+    </div>
+</div>
+
+<script>
+    // Define a variable to store the wishlist data
+    const wishlistData = JSON.parse('{{ wishlist_data|escapejs }}');
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const wishlistContainer = document.getElementById('wishlist-container');
+        wishlistData.forEach(book => {
+            const card = document.createElement('div');
+            card.className = 'max-w-sm m-4 bg-white rounded-lg shadow-md dark:bg-gray-800';
+            card.innerHTML = `
+                <img class="w-32 h-48 object-cover rounded-t-lg" src="${book.image_link}" alt="Book Image">
+                <div class="p-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark-text-gray-200">${book.title}</h2>
+                    <button class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover-bg-red-600 focus-ring-2 focus-ring-red-400 focus-outline-none" onclick="removeFromWishlist(${book.id})" data-book="${book.id}">
+                        Remove from Wishlist
+                    </button>
+                </div>
+            `;
+            wishlistContainer.appendChild(card);
+        });
+    });
+
+    // Function to remove a book from the wishlist
+    function removeFromWishlist(bookId) {
+        // You can use the bookId to send a request to remove the book from the wishlist
+        // Example code to remove the book via an AJAX request:
+        fetch(`{% url 'manage_user:remove_wishlist' book_id=0 %}`.replace('0', bookId), {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+        })
+        .then(response => {
+            if (response.status === 204) {
+                // Book removed successfully
+                // You can remove the book from the UI if needed
+                const removedBook = document.querySelector(`[data-book="${bookId}"]`);
+                if (removedBook) {
+                    removedBook.parentNode.removeChild(removedBook);
+                }
+            } else {
+                console.error('Failed to remove the book from the wishlist');
+            }
+        })
+        .catch(error => {
+            console.error('Error removing the book from the wishlist:', error);
+        });
+    }
+</script>
+
+{% endblock content %}

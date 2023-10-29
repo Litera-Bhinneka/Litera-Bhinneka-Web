@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from catalog.models import Book
 from manage_user.models import Inventory, Wishlist
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, JsonResponse
 from django.urls import reverse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 
 # Create your views here.
@@ -34,18 +36,30 @@ def get_book_json(request):
 
 
 @csrf_exempt
+@login_required(login_url='/authentication/login/')
 def increment_book_ajax(request, book_id):
-    print(request.method)
-    book = Book.objects.get(pk=book_id)
-    user = request.user
+    if request.method == "POST":
+        try:
+            book = Book.objects.get(pk=book_id)
+            user = request.user
 
-    # Create or increment the Inventory object
-    inventory, created = Inventory.objects.get_or_create(user=user, book=book)
-    if not created:
-        inventory.amount += 1
-        inventory.save()
-        
-    return HttpResponse(b"DELETED", status=201)
+            # Check if the book is already in the user's inventory
+            inventory = Inventory.objects.filter(user=user, book=book).first()
+
+            if inventory is None:
+                # If not in inventory, create a new inventory entry
+                inventory = Inventory(user=user, book=book, amount=1)
+            else:
+                # If already in inventory, increment the quantity
+                inventory.amount += 1
+
+            inventory.save()
+            return HttpResponse(b"OK", status=201)
+
+        except Book.DoesNotExist:
+            return HttpResponseNotFound("Book not found")
+
+    return HttpResponseNotFound("Invalid request")
 
 def add_wishlist(request, book_id):
     if request.method =="POST":
@@ -57,33 +71,60 @@ def add_wishlist(request, book_id):
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
 
+@login_required(login_url='/authentication/login/')
 def remove_wishlist(request, book_id):
-    if request.method =="DELETE":
-        book = Book.objects.get(pk=book_id)
-        user = request.user
-        Wishlist.objects.filter(user=user, book=book).delete()
-        return HttpResponse(b"DELETED", status=201)
-    return HttpResponseNotFound()
+    user = request.user
+    try:
+        # Dapatkan objek Wishlist yang sesuai dengan user dan buku
+        wishlist = Wishlist.objects.get(user=user, book_id=book_id)
+        # Hapus objek Wishlist tersebut
+        wishlist.delete()
+        return HttpResponseRedirect(reverse('user_page'))  # Ganti dengan URL yang sesuai
+    except Wishlist.DoesNotExist:
+        # Handle jika objek Wishlist tidak ditemukan
+        return HttpResponseNotFound("Wishlist item not found")
+    
+def get_wishlist_json(request):
+    user = request.user
+    wishlist_books = Wishlist.objects.filter(user=user).values('book')
+    books = Book.objects.filter(pk__in=wishlist_books)
+    wishlist_data = [{'title': book.title, 'image_link': book.image_link} for book in books]
+    return JsonResponse(wishlist_data, safe=False)
+
+# Fungsi untuk menampilkan wishlist user
+@login_required(login_url='/authentication/login/')
+def show_wishlist(request):
+    user = request.user
+
+    # Fetch the wishlist data for the logged-in user
+    wishlist_books = Wishlist.objects.filter(user=user).values('book')
+    books = Book.objects.filter(pk__in=wishlist_books)
+
+    wishlist_data = [{'title': book.title, 'image_link': book.image_link} for book in books]
+
+    context = {
+        'wishlist_data': wishlist_data,  # Pass the wishlist data to the template
+        'name': request.user.username,
+    }
+
+    return render(request, "show_wishlist.html", context)
         
-# @csrf_exempt
-# def add_review_ajax(request, book_id1, book_id2):
-#     if request.method == 'POST':
-#         print(request.POST)
-#         print(request.POST.get("rating"))
-#         review_text = request.POST.get("review_text")
-#         review_summary = request.POST.get("review_summary")
-#         reviewer_name = request.user.username
-#         rating = int(request.POST.get("review_score"))
-#         book_title = get_object_or_404(Book, pk=book_id2).title
+# Fungsi untuk menampilkan inventory user
+@login_required(login_url='/authentication/login/')
+def show_inventory(request):
+    user = request.user
+    inventory_books = Inventory.objects.filter(user=user)
+    
+    # Menggunakan annotate untuk menghitung jumlah buku dalam inventory
+    books = Book.objects.filter(pk__in=inventory_books.values('book'))
+    context = {
+        'books': books,
+        'name': request.user.username,
+        'inventory': {i.book.pk :i for i in inventory_books}
+    }
+    print(context['inventory'])
+    return render(request, "show_inventory.html", context)
 
-#         new_review = Review(book_title=book_title,
-#                              reviewer_name=reviewer_name, 
-#                              review_score=rating,
-#                              review_summary=review_summary,
-#                              review_text=review_text)
-#         new_review.save()
+        
 
-#         return HttpResponse(b"CREATED", status=201)
-#     print(request.method)
 
-#     return HttpResponseNotFound()
