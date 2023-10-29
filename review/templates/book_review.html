@@ -15,7 +15,8 @@
     <script type="text/javascript">
         const csrfToken = "{{ csrf_token }}";
         window.book_id = "{{ book.id }}";
-        window.deleteWishlistUrl = "{% url 'manage_user:remove_wishlist' book_id=book.id %}"
+        window.addWishlistUrl = "{% url 'manage_user:add_wishlist' book_id=book.id %}"
+        window.deleteWishlistUrl = "{% url 'manage_user:remove_wishlist_sec' book_id=book.id %}"
     </script>
 
     <div class="m-4">
