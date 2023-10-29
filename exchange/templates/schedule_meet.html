@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block meta%}
 <title>Schedule a Meet</title>
 {% endblock meta%}
 
 {% block content %}
+<script type="text/javascript">
+    const csrfToken = "{{ csrf_token }}";
+    window.ShowOffer = "{% url 'exchange:show_offers' %}";
+    window.id = "{{ id }}";
+</script>
 <div class="mt-4 ml-4 mr-4">
     <a href="{% url 'exchange:show_books' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full mr-4">
         Back
@@ -33,54 +38,5 @@
     </div>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("scheduleMeetForm");
-    const modal = document.getElementById("Modal");
-    const modalMessage = document.querySelector("#Modal .text-center");
-    const modalOKButton = document.getElementById("successModalOK");
-    const modalCloseButton = document.getElementById("ModalClose");
-
-    form.addEventListener("submit", function (event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        fetch("/exchange/schedule-meet/{{ id }}/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}", // Include the CSRF token
-            },
-            body: new FormData(form), // Use FormData to send form data
-        })
-        .then(response => {
-            if (response.ok) {
-                form.reset();
-            }
-            return response.json();
-        }) // Handle the response as needed
-        .then(data => {
-            if (data.message) {
-                // Display the modal with the response message
-                modalMessage.textContent = data.message;
-                modal.classList.remove("hidden");
-            } else {
-                modalMessage.textContent = "Oops, something went wrong!";
-                modal.classList.remove("hidden");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
-    });
-    // Add an event listener to the modal's OK button to hide the modal
-    modalOKButton.addEventListener("click", function () {
-        modal.classList.add("hidden");
-        window.location.href = "{% url 'exchange:show_offers' %}";
-    });
-
-    modalCloseButton.addEventListener("click", function () {
-        modal.classList.add("hidden");
-        window.location.href = "{% url 'exchange:show_offers' %}";
-    });
-});
-</script>
+<script defer src="{% static 'exchange_schedule_meet.js' %}"></script>
 {% endblock content %}
