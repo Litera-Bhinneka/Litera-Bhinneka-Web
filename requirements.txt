@@ -8,3 +8,4 @@ django-widget-tweaks
 django-crispy-forms
 crispy-tailwind
 django-guest-user
+django-environ
