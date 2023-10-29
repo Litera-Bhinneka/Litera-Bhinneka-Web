@@ -107,10 +107,16 @@ def show_wishlist(request):
     user = request.user
 
     # Fetch the wishlist data for the logged-in user
-    wishlist_books = Wishlist.objects.filter(user=user).values('book')
-    books = Book.objects.filter(pk__in=wishlist_books)
+    wishlist_items = Wishlist.objects.filter(user=user)
+    
+    wishlist_data = []
 
-    wishlist_data = [{'title': book.title, 'image_link': book.image_link} for book in books]
+    for item in wishlist_items:
+        wishlist_data.append({
+            'id': item.book.id,
+            'title': item.book.title,
+            'image_link': item.book.image_link,
+        })
 
     context = {
         'wishlist_data': wishlist_data,  # Pass the wishlist data to the template
