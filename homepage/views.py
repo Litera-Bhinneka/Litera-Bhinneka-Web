@@ -12,6 +12,7 @@ from catalog.management.commands.load_book_data import Command
 
 
 # Create your views here.
+@login_required(login_url='/authentication/login/')
 def show_homepage(request):
     form = FeedbackForm()
     last_login = request.COOKIES.get('last_login', 'Default Value if last_login not found')
