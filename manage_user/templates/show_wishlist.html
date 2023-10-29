@@ -12,11 +12,47 @@
     </a>
     {% endif %}
 
-    <h2 class="text-2xl font-bold my-4">Your Wishlist</h2>
-    <div class="flex flex-wrap justify-center" id="wishlist-container">
-        <!-- Wishlist items will be displayed here -->
+    <div>
+        <div class="text-center">
+            <strong class="text-2xl md:text-5xl lg:text-7xl xl:text-10xl">Your Wishlist</strong>
     </div>
+
+    {% for book in wishlist_data %}
+    <div class="m-4 bg-white rounded-lg shadow-md dark:bg-gray-800 w-64 flex flex-col justify-center items-center">
+        <img class="w-32 h-48 object-cover rounded-t-lg" src="{{ book.image_link }}" alt="Book Image">
+        <div class="p-4">
+            <h2 class="text-xl font-semibold text-gray-800 dark-text-gray-200">{{ book.title }}</h2>
+            <p class="text-gray-600 dark-text-gray-400">{{ book.author }}</p>
+            <p class="text-gray-600 dark-text-gray-400" id="quantity-{{ book.pk }}">Quantity: {{ book.Inventory_amount }}</p>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-gray-500 text-lg my-4">Your wishlist is empty.</div>
+    {% endfor %}
 </div>
+    <div id="bookModal" class="fixed inset-0 flex items-center justify-center z-10 hidden">
+        <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
+        <div class="modal-container bg-white w-1/3 md:w-1/4 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+            <div class="modal-content py-4 text-left px-6">
+                <div class="flex justify-between items-center pb-3">
+                    <p class="text-2xl font-bold">Book Owners</p>
+                    <button class="modal-close" onclick="closeModal()">
+                        <span class="text-2xl">&times;</span>
+                    </button>
+                </div>
+                <div id="owners" class="mb-4">
+                    <!-- Content of owners here -->
+                </div>
+                <div class="flex justify-center"> <!-- Centering div -->
+                    <button onclick="closeModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock content %}
 
 <script>
     // Define a variable to store the wishlist data
@@ -68,4 +104,4 @@
     }
 </script>
 
-{% endblock content %}
+
