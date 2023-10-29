@@ -3,7 +3,7 @@
 {% block meta%}
 <title>Recommendation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
-<link rel="stylesheet" href="{% static 'recommend_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/recommend_styles.css' %}">
 <script type="text/javascript">
     window.recommendationUrl = "{% url 'recommendation:get_out_recommendation_json' %}";
     window.recommendationSearchUrl = "{% url 'recommendation:search_out_recommendation' %}?query=";
@@ -43,6 +43,6 @@
 
 <br>
 <script defer src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script defer src="{% static 'out_recommend_script.js' %}"></script>
+<script defer src="{% static 'js/out_recommend_script.js' %}"></script>
 
 {% endblock content %}

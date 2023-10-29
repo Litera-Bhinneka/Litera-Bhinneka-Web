@@ -4,7 +4,7 @@
 {% block meta%}
 <title>Recommendation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
-<link rel="stylesheet" href="{% static 'recommend_styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/recommend_styles.css' %}">
 <script type="text/javascript">
     window.recommendationUrl = "{% url 'recommendation:get_out_recommendation_json' %}";
 </script>
@@ -36,5 +36,5 @@
         </div>
     </div>
 </div>
-<script defer src="{% static 'out_recommend_add_script.js' %}"></script>
+<script defer src="{% static 'js/out_recommend_add_script.js' %}"></script>
 {% endblock content %}
