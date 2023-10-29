@@ -26,6 +26,7 @@ def show_books(request):
         'books': books,
         'name': request.user.username,
         'isadmin' : request.user.is_superuser,
+        'query' : search_query,
     }
 
     return render(request, "show_owners.html", context)
@@ -101,6 +102,7 @@ def show_offers(request):
             user1_items = json.loads(offer.Inventory1)
             user2_items = json.loads(offer.Inventory2)
             user1_name = offer.Username1
+            user2_name = offer.Username2
             meet = Meet.objects.filter(offer=offer)
             if (len(meet) > 0):
                 meet = meet[0]
@@ -111,6 +113,7 @@ def show_offers(request):
                 'user1_items': user1_items,
                 'user2_items': user2_items,
                 'user1_name': user1_name,
+                'user2_name': user2_name,
                 'id': offer.pk,
                 'meet': meet,
             })

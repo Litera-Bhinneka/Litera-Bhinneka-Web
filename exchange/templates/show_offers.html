@@ -1,170 +1,242 @@
 {% extends 'base.html' %}
-
+{% block meta%}
+<title>Show Offers</title>
+{% endblock meta%}
 {% block content %}
 <div class="p-4">
-    <a href="{% url 'exchange:show_books' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
-        Back
-    </a>
-    {% if isadmin %}
-    <a href="{% url 'admin:index' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
-        Admin
-    </a>
-    {% endif %}
-    <br><br>
-    {% if isadmin %}
-    <h2 class="text-2xl font-bold mb-4">Offers</h2>
-    <ul class="space-y-4">
-        {% for offer in offers %}
-        <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
-            <div>
-                <div class="text-lg font-semibold mb-2">From {{offer.user2_name}} To {{ offer.user1_name }}</div>
-                <!-- Add additional offer details here if needed -->
-                {{offer.user2_name}} Offered:
-                <div class="flex space-x-4">
-                    {% for item in offer.user2_items %}
-                    <div class="text-sm">
-                        {{ item.quantity }} x {{ item.book_title }}
+    <div class="m-4">
+        <a href="{% url 'exchange:show_books' %}" class="text-white bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded-full mr-4">
+            Back
+        </a>
+        {% if isadmin %}
+        <a href="{% url 'admin:index' %}" class="text-white bg-gray-500 hover-bg-gray-700 py-2 px-4 rounded-full">
+            Admin
+        </a>
+        {% endif %}
+    </div>
+    <div class="m-4">
+        <div class="text-center">
+            <strong class="text-2xl md:text-5xl lg:text-7xl xl:text-10xl">Offers</strong>
+        </div>
+        {% if isadmin %}
+        <ul class="space-y-4">
+            {% for offer in offers %}
+            <li class="max-w-md mx-auto bg-white rounded-lg shadow-md p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <div class="text-lg font-semibold mb-2">From {{ offer.user2_name }} To {{ offer.user1_name }}</div>
                     </div>
-                    {% empty %}
-                    Nothing
-                    {% endfor %}
+                    <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Delete</button>
                 </div>
-                For {{offer.user1_name}}'s:
-                <div class="flex space-x-4">
-                    {% for item in offer.user1_items %}
-                    <div class="text-sm">
-                        {{ item.quantity }} x {{ item.book_title }}
+                <div class="flex justify-between items-center pl-7 pr-7">
+                    <div class="bg-gray-400 h-40 w-40 p-2 rounded">
+                        <div class="h-full overflow-auto">
+                            {{offer.user2_name}} Offered:
+                            <div class="flex flex-col space-y-2">
+                                {% for item in offer.user2_items %}
+                                <div class="text-sm overflow-hidden">
+                                    {{ item.quantity }} x <span class="block">{{ item.book_title }}</span>
+                                </div>
+                                {% empty %}
+                                Nothing
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
-                    {% empty %}
-                    Nothing
-                    {% endfor %}
-                </div>
-            </div>
-            {% if offer.meet %}
-            <div class="meet-details bg-white p-4 rounded shadow-md">
-                <h5>Scheduled a Meeting</h5>
-                <h6 class="text-lg font-semibold">Date:</h6>
-                <p class="text-gray-800">{{ offer.meet.date }}</p>
-                <h6 class="text-lg font-semibold">Location:</h6>
-                <p class="text-gray-800">{{ offer.meet.location }}</p>
-                <h6 class="text-lg font-semibold">Message:</h6>
-                <p class="text-gray-800">{{ offer.meet.message }}</p>
-            </div>
-            {% endif %}
-            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Delete</button>
-        </li>
-        {% empty %}
-        <li class="text-gray-600">
-            There are no offers.
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <h2 class="text-2xl font-bold mb-4">Offers Sent</h2>
-    <ul class="space-y-4">
-        {% for offer in sent_offers %}
-        <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
-            <div>
-                <div class="text-lg font-semibold mb-2">To {{ offer.user1_name }}</div>
-                <!-- Add additional offer details here if needed -->
-                You Offered:
-                <div class="flex space-x-4">
-                    {% for item in offer.user2_items %}
-                    <div class="text-sm">
-                        {{ item.quantity }} x {{ item.book_title }}
+                    <div class="bg-gray-400 h-40 w-40 p-2 rounded">
+                        <div class="h-full overflow-auto">
+                            For {{offer.user1_name}}'s:
+                            <div class="flex flex-col space-y-2">
+                                {% for item in offer.user1_items %}
+                                <div class="text-sm overflow-hidden">
+                                    {{ item.quantity }} x <span class="block">{{ item.book_title }}</span>
+                                </div>
+                                {% empty %}
+                                Nothing
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
-                    {% empty %}
-                    Nothing
-                    {% endfor %}
                 </div>
-                For {{offer.user1_name}}'s:
-                <div class="flex space-x-4">
-                    {% for item in offer.user1_items %}
-                    <div class="text-sm">
-                        {{ item.quantity }} x {{ item.book_title }}
+                {% if offer.meet %}
+                <div class="meet-details bg-gray-100 p-4 rounded shadow-md mt-4">
+                    <div class="flex justify-center">
+                        <div class="font-bold">Scheduled a Meeting</div>
                     </div>
-                    {% empty %}
-                    Nothing
-                    {% endfor %}
-                </div>
-            </div>
-            {% if offer.meet %}
-            <div class="meet-details bg-white p-4 rounded shadow-md">
-                <h5>Scheduled a Meeting</h5>
-                <h6 class="text-lg font-semibold">Date:</h6>
-                <p class="text-gray-800">{{ offer.meet.date }}</p>
-                <h6 class="text-lg font-semibold">Location:</h6>
-                <p class="text-gray-800">{{ offer.meet.location }}</p>
-                <h6 class="text-lg font-semibold">Message:</h6>
-                <p class="text-gray-800">{{ offer.meet.message }}</p>
-            </div>
-            {% endif %}
-            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Cancel</button>
-        </li>
-        {% empty %}
-        <li class="text-gray-600">
-            You haven't sent any offers.
-        </li>
-        {% endfor %}
-    </ul>
-
-    <h2 class="text-2xl font-bold mt-4 mb-4">Offers Received</h2>
-    <ul class="space-y-4">
-        {% for offer in received_offers %}
-        <li class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center">
-            <div>
-                <div class="text-lg font-semibold mb-2">From {{ offer.user2_name }}</div>
-                <!-- Add additional offer details here if needed -->
-                {{offer.user2_name}} Offered:
-                <div class="flex space-x-4">
-                    {% for item in offer.user2_items %}
-                    <div class="text-sm">
-                        {{ item.quantity }} x {{ item.book_title }}
+                    <div class="flex items-center space-x-2">
+                        <p class="font-semibold">Date:</p>
+                        <p class="text-gray-800">{{ offer.meet.date }}</p>
                     </div>
-                    {% empty %}
-                    Nothing
-                    {% endfor %}
-                </div>
-                For Your:
-                <div class="flex space-x-4">
-                    {% for item in offer.user1_items %}
-                    <div class="text-sm">
-                        {{ item.quantity }} x {{ item.book_title }}
+                    <div class="flex items-center space-x-2">
+                        <p class="font-semibold">Location:</p>
+                        <p class="text-gray-800">{{ offer.meet.location }}</p>
                     </div>
-                    {% empty %}
-                    Nothing
-                    {% endfor %}
+                    <h6 class="font-semibold">Message:</h6>
+                    <p class="text-gray-800">{{ offer.meet.message }}</p>
                 </div>
+                {% endif %}
+            </li>
+            {% empty %}
+            <li class="text-gray-600">
+                There are no offers.
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="flex space-x-4">
+            <div class="w-1/2">
+                <h3 class="text-xl font-bold mb-4 text-center">Sent</h3>
+                <ul class="space-y-4">
+                    {% for offer in sent_offers %}
+                    <li class="max-w-md mx-auto bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <div class="text-lg font-semibold mb-2">To {{ offer.user1_name }}</div>
+                            </div>
+                            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Cancel</button>
+                        </div>
+                        <div class="flex justify-between items-center pl-7 pr-7">
+                            <div class="bg-gray-400 h-40 w-40 p-2 rounded">
+                                <div class="h-full overflow-auto">
+                                    <div class="font-bold">
+                                        You Offered:
+                                    </div>
+                                    <div class="flex flex-col space-y-2">
+                                        {% for item in offer.user2_items %}
+                                        <div class="text-sm overflow-hidden">
+                                            {{ item.quantity }} x <span class="block">{{ item.book_title }}</span>
+                                        </div>
+                                        {% empty %}
+                                        Nothing
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-400 h-40 w-40 p-2 rounded">
+                                <div class="h-full overflow-auto">
+                                    <div class="font-bold">
+                                        For {{ offer.user1_name }}'s:
+                                    </div>
+                                    <div class="flex flex-col space-y-2">
+                                        {% for item in offer.user1_items %}
+                                        <div class="text-sm overflow-hidden">
+                                            {{ item.quantity }} x <span class="block">{{ item.book_title }}</span>
+                                        </div>
+                                        {% empty %}
+                                        Nothing
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if offer.meet %}
+                        <div class="meet-details bg-gray-100 p-4 rounded shadow-md mt-4">
+                            <div class="flex justify-center">
+                                <div class="font-bold">Scheduled a Meeting</div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <p class="font-semibold">Date:</p>
+                                <p class="text-gray-800">{{ offer.meet.date }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <p class="font-semibold">Location:</p>
+                                <p class="text-gray-800">{{ offer.meet.location }}</p>
+                            </div>
+                            <h6 class="font-semibold">Message:</h6>
+                            <p class="text-gray-800">{{ offer.meet.message }}</p>
+                        </div>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="text-gray-600 text-center">
+                        You haven't sent any offers.
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
-            {% if offer.meet %}
-            <div class="meet-details bg-white p-4 rounded shadow-md">
-                <h5>Scheduled a Meeting</h5>
-                <h6 class="text-lg font-semibold">Date:</h6>
-                <p class="text-gray-800">{{ offer.meet.date }}</p>
-                <h6 class="text-lg font-semibold">Location:</h6>
-                <p class="text-gray-800">{{ offer.meet.location }}</p>
-                <h6 class="text-lg font-semibold">Message:</h6>
-                <p class="text-gray-800">{{ offer.meet.message }}</p>
+            <!-- <div class="h-full w-0.5 bg-gray shadow-md"></div> -->
+            <div class="w-1/2">
+                <h3 class="text-xl font-bold mb-4 text-center">Received</h3>
+                <ul class="space-y-4">
+                    {% for offer in received_offers %}
+                    <li class="max-w-md mx-auto bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <div class="text-lg font-semibold mb-2">From {{ offer.user2_name }}</div>
+                            </div>
+                            <div>
+                                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" onclick="sendRequest(this.getAttribute('data-offer-id'), true)" data-offer-id="{{ offer.id }}" id="accept">Accept</button>
+                                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Reject</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pl-7 pr-7">
+                            <div class="bg-gray-400 h-40 w-40 p-2 rounded">
+                                <div class="h-full overflow-auto">
+                                    <div class="font-bold">
+                                        {{ offer.user2_name }} Offered:
+                                    </div>
+                                    <div class="flex flex-col space-y-2">
+                                        {% for item in offer.user2_items %}
+                                        <div class="text-sm overflow-hidden">
+                                            {{ item.quantity }} x <span class="block">{{ item.book_title }}</span>
+                                        </div>
+                                        {% empty %}
+                                        Nothing
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-400 h-40 w-40 p-2 rounded">
+                                <div class="h-full overflow-auto">
+                                    <div class="font-bold">
+                                        For Your:
+                                    </div>
+                                    <div class="flex flex-col space-y-2">
+                                        {% for item in offer.user1_items %}
+                                        <div class="text-sm overflow-hidden">
+                                            {{ item.quantity }} x <span class="block">{{ item.book_title }}</span>
+                                        </div>
+                                        {% empty %}
+                                        Nothing
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if offer.meet %}
+                        <div class="meet-details bg-gray-100 p-4 rounded shadow-md mt-4">
+                            <div class="flex justify-center">
+                                <div class="font-bold">Scheduled a Meeting</div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <p class="font-semibold">Date:</p>
+                                <p class="text-gray-800">{{ offer.meet.date }}</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <p class="font-semibold">Location:</p>
+                                <p class="text-gray-800">{{ offer.meet.location }}</p>
+                            </div>
+                            <h6 class="font-semibold">Message:</h6>
+                            <p class="text-gray-800">{{ offer.meet.message }}</p>
+                        </div>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="text-gray-600 text-center">
+                        You haven't received any offers.
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
-            {% endif %}
-            <div>
-                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" onclick="sendRequest(this.getAttribute('data-offer-id'), true)" data-offer-id="{{ offer.id }}" id = "accept">Accept</button>
-                <button class="bg-red-500 text-white px-4 py-2 ml-4 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Reject</button>
-            </div>
-        </li>
-        {% empty %}
-        <li class="text-gray-600">
-            You haven't received any offers.
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Modal for Prompt -->
 <div id="modalPrompt" class="fixed inset-0 flex items-center justify-center z-10 hidden">
     <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
-    <div class="modal-container bg-white w-1/2 md:w-1/3 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
+    <div class="modal-container bg-white w-1/6 md:w-1/6 mx-auto p-4 rounded-lg shadow-lg z-50 relative">
         <span id="modalPromptClose" class="absolute top-0 right-0 m-4 text-gray-600 cursor-pointer">&times;</span>
         <p id="modalPromptMessage" class="text-lg font-semibold mb-2"></p>
     </div>
@@ -217,7 +289,7 @@
                 } else {
                     openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
                 }
-                })
+            })
             .catch(function () {
                 openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
             });
