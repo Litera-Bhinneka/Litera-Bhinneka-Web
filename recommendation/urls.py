@@ -1,6 +1,5 @@
 from django.urls import path
-from recommendation.views import show_main, show_recommendation, add_recommendation, get_recommendation_json, add_recommendation_ajax, get_user_inventory_json, get_book_image, add_recommendation_ajax, get_book_ids, search_recommendation, show_out_recommendation, outside_recommendation_add, get_out_recommendation_json 
-
+from recommendation.views import show_main, show_recommendation, add_recommendation, get_recommendation_json, add_recommendation_ajax, get_user_inventory_json, get_book_image, add_recommendation_ajax, get_book_ids, search_recommendation, show_out_recommendation, outside_recommendation_add, get_out_recommendation_json, search_out_recommendation
 app_name = 'recommendation'
 
 urlpatterns = [
@@ -17,4 +16,5 @@ urlpatterns = [
     path('get-book-ids/', get_book_ids, name='get_book_ids'),
     path('outside-recommendation-add/', outside_recommendation_add, name='outside_recommendation_add'),
     path('get-out-recommendation-json/', get_out_recommendation_json, name='get_out_recommendation_json'),
+    path('search-out-recommendation/', search_out_recommendation, name='search_out_recommendation'),
 ]

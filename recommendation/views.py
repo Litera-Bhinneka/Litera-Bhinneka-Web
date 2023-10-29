@@ -77,12 +77,23 @@ def search_recommendation(request):
             recs = Recommendation.objects.all()
         print(recs)
         recs_list = [{'pk': rec.pk, 'book_title': rec.book_title, 'another_book_title': rec.another_book_title, 'book_id': rec.book_id, 'another_book_id': rec.another_book_id, 'book_image': rec.book_image, 'another_book_image': rec.another_book_image, 'recommender_name': rec.recommender_name, 'recommendation_scale': rec.recommendation_scale, 'description': rec.description, 'recommendation_date': rec.recommendation_date} for rec in recs]
-        for rec in recs_list:
-            print(rec['description'])
         return JsonResponse({'recommendations': recs_list})
     else:
         return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400)
-    
+
+def search_out_recommendation(request):
+    if request.method == 'GET':
+        query = request.GET.get('query', '')
+
+        if query:
+            recs = OutsideRecommendation.objects.filter(Q(out_book_title__icontains=query) | Q(another_out_book_title__icontains=query) | Q(out_recommender_name__icontains=query))
+        else:
+            recs = OutsideRecommendation.objects.all()
+        print(recs)
+        recs_list = [{'pk': rec.pk, 'book_title': rec.out_book_title, 'another_book_title': rec.another_out_book_title, 'recommender_name': rec.out_recommender_name, 'description': rec.out_description, 'recommendation_date': rec.out_recommendation_date} for rec in recs]
+        return JsonResponse({'recommendations': recs_list})
+    else:
+        return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400)
 @login_required(login_url='/authentication/login/')
 @csrf_exempt
 def outside_recommendation_add(request):
