@@ -15,12 +15,14 @@ from catalog.management.commands.load_book_data import Command
 @login_required(login_url='/authentication/login/')
 def show_homepage(request):
     form = FeedbackForm()
+    last_login = request.COOKIES.get('last_login', 'Default Value if last_login not found')
+    
     context = {
         'name': request.user.username,
-        'last_login': request.COOKIES['last_login'],
+        'last_login': last_login,
         # 'last_feedback': request.session.get('last_feedback', 'Belum ada feedback yang diberikan'),
-        'form':form,
-        'isadmin' : request.user.is_staff,
+        'form': form,
+        'isadmin': request.user.is_staff,
     }
     Command().handle()
     return render(request, "homepage.html", context)
