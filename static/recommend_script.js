@@ -207,14 +207,80 @@ async function addRecommendationAjax() {
     document.getElementById("description").value = ""
     return false
 }
-// function addRecommendation() {
-//     fetch("{% url 'recommendation:add_recommendation_ajax' %}", {
-//         method: "POST",
-//         body: new FormData(document.querySelector('#form'))
-//     }).then(refreshRecommendations)
+// Search form
+document.getElementById("searchForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent the form from submitting the traditional way
+    // Get the search query from the input field
+    const searchQuery = document.getElementById("default-search").value;
+    const searchResultsElement = document.getElementById("searchResults");
+    searchResultsElement.innerHTML = "";
+    // Perform the search logic here
+    fetch(window.recommendationSearchUrl + searchQuery)
+      .then((res) => res.json())
+      .then((data) => {
+        const cardcontainer = document.getElementById("card-container");
+        cardcontainer.innerHTML = "";
+        
+        if (data.recommendations.length > 0) {
+            let htmlString = ''
+            data.recommendations.forEach((rec) => {
+                let datetime = rec.recommendation_date;
+                let formattedDate = (new Date(datetime)).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                });
+                if(rec.description == undefined){
+                    rec.description = ""
+                }
+                htmlString += `
+                <div class="w-full p-4 mb-4">
+                    <div class="card">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="card-content">
+                                <div class="card-title">If you like to read this book </div>
+                                <a href="/review/book-review/${rec.book_id}" class="flex flex-col items-center rounded-lg md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                    <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="${rec.book_image}" id="book-image2" alt="book image">
+                                    <div class="flex flex-col justify-between p-4 leading-normal">
+                                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${rec.book_title}</h5>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-title">You may like to read this book </div>
+                                <a href="/review/book-review/${rec.another_book_id}" class="flex flex-col items-center rounded-lg md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700">
+                                    <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" src="${rec.another_book_image}" id="book-image2" alt="book image">
+                                    <div class="flex flex-col justify-between p-4 leading-normal">
+                                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${rec.another_book_title}</h5>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                            <div class="card-desc">
+                                ${rec.description}
+                            </div>
+                            <div class="card-footer">
+                                <span class="card-date">recommended by ${rec.recommender_name} - ${formattedDate}</span>
+                            </div>
+                    </div>
+                </div>`;
+                document.getElementById("card-container").innerHTML = htmlString;
+            });
+        } else {
+          searchResultsElement.innerHTML += `<p>There are no results for your search query.</p>`;
+        }
+    });
 
-//     document.getElementById("form").reset()
-//     return false
-// }
+    // Update the DOM with search results
+    
+    if(searchQuery != ""){
+        searchResultsElement.innerHTML += `<p>Search results for: <strong>${searchQuery}</strong></p>`;
+    }
+    // You can further customize the HTML structure based on your needs
+});
+
 refreshInventory()
 refreshRecommendations()
