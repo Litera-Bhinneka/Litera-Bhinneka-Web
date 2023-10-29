@@ -18,6 +18,20 @@ nav{
 .star-widget input:checked ~ label{
     color: #fd4;
 }
+.love-widget label {
+    font-size: 30px;
+    color: #c4c4c4;
+    padding: 7px;
+    float: right;
+    transition: all 0.2s ease;
+    cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+}
+
+.love-widget input:not(:checked) ~ label:hover,
+.love-widget input:not(:checked) ~ label:hover ~ label,
+.love-widget input:checked ~ label {
+    color: rgb(213, 52, 52);
+}
 #book_image{
     background-color: #cad1da;
 }
