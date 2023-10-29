@@ -12,14 +12,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
 # Create your views here.
-@login_required(login_url='/authentication/login/')
+# @login_required(login_url='/authentication/login/')
 def show_main(request):
     context = {
         'name': request.user.username
     }
     return render(request, 'show_main.html', context)
 
-@login_required(login_url='/authentication/login/')
+# @login_required(login_url='/authentication/login/')
 def show_recommendation(request):
     recommendations = Recommendation.objects.all().values()
     context = {
@@ -28,7 +28,7 @@ def show_recommendation(request):
     }
     return render(request, 'show_recommendation.html', context)
 
-@login_required(login_url='/authentication/login/')
+# @login_required(login_url='/authentication/login/')
 def show_out_recommendation(request):
     outside_recommendations = OutsideRecommendation.objects.all().values()
     context = {
@@ -66,7 +66,7 @@ def add_recommendation_ajax(request, bookId1, bookId2):
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
 
-@login_required(login_url='/authentication/login/')
+# @login_required(login_url='/authentication/login/')
 def search_recommendation(request):
     if request.method == 'GET':
         query = request.GET.get('query', '')
@@ -94,6 +94,7 @@ def search_out_recommendation(request):
         return JsonResponse({'recommendations': recs_list})
     else:
         return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400)
+    
 @login_required(login_url='/authentication/login/')
 @csrf_exempt
 def outside_recommendation_add(request):
