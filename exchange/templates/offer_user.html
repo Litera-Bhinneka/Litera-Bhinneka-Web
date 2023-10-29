@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block meta%}
+<title>Offer a User</title>
+{% endblock meta%}
+
 {% block content %}
 <div class="p-4"> <!-- Add padding -->
     <div class="mt-1 mb-4 ml-2">
@@ -11,7 +15,7 @@
         {% csrf_token %}
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <h2 class="text-xl font-bold mb-4">{{ user1.user.username }}'s Inventory</h2>
+                <h2 class="text-xl font-bold mb-4 text-center">{{ user1.user.username }}'s Inventory</h2>
                 <ul>
                     {% for item in user1.inventory_items %}
                     <li class="mb-4">
@@ -41,12 +45,14 @@
                             }
                         </script>
                     </li>
+                    {% empty %}
+                    <h2 class="text-2xl font-semibold mb-4 text-center">Inventory is Empty</h2>
                     {% endfor %}
                 </ul>
             </div>
         
             <div>
-                <h2 class="text-xl font-bold mb-4">Your Inventory</h2>
+                <h2 class="text-xl font-bold mb-4 text-center">Your Inventory</h2>
                 <ul>
                     {% for item in user2.inventory_items %}
                     <li class="mb-4">
@@ -76,6 +82,8 @@
                             }
                         </script>
                     </li>
+                    {% empty %}
+                    <h2 class="text-2xl font-semibold mb-4 text-center">Inventory is Empty</h2>
                     {% endfor %}
                 </ul>
             </div>
@@ -85,10 +93,6 @@
         </div>
     </form>
     
-    
-    
-    
-
 <!-- Success Modal -->
 <div id="successModal" class="fixed inset-0 flex items-center justify-center z-10 hidden">
     <div class="modal-overlay fixed inset-0 bg-black opacity-50"></div>
