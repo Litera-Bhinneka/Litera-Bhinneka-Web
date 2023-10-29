@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.db.models import Q
 from review.management.commands.load_rating_data import Command
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import BookEditForm
 
 
 # Create your views here.
@@ -58,6 +60,19 @@ def search_books(request):
 
         return JsonResponse({'books': book_list})
     else:
-        return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400)
+        return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400) 
 
+def edit_book(request, id):
+    # Get product berdasarkan ID
+    product = Book.objects.get(pk = id)
 
+    # Set product sebagai instance dari form
+    form = BookEditForm(request.POST or None, instance=product)
+
+    if form.is_valid() and request.method == "POST":
+        # Simpan form dan kembali ke halaman awal
+        form.save()
+        return redirect('catalog:show_catalog')
+
+    context = {'form': form, 'name': request.user.username,}
+    return render(request, "edit_book.html", context)
