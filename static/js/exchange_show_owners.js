@@ -61,7 +61,7 @@ async function openModal(book_id) {
             // Create a button "Send Offer" for the user
             const sendOfferButton = document.createElement("button");
             sendOfferButton.textContent = "Send Offer";
-            sendOfferButton.className = "send-offer-button";
+            sendOfferButton.className = "custom-button";
             sendOfferButton.onclick = function () {
                 window.location.href = "/exchange/offer-user/" + ownerUsername + "/";
             };
