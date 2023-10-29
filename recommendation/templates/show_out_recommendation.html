@@ -6,10 +6,7 @@
 <link rel="stylesheet" href="{% static 'recommend_styles.css' %}">
 <script type="text/javascript">
     window.recommendationUrl = "{% url 'recommendation:get_out_recommendation_json' %}";
-    window.bookIdsUrl = "{% url 'recommendation:get_book_ids' %}";
-    window.userInventoryUrl = "{% url 'recommendation:get_user_inventory_json' %}";
-    window.bookImageUrl = "{% url 'recommendation:get_book_image' %}";
-    window.recommendationSearchUrl = "{% url 'recommendation:search_recommendation' %}?query=";
+    window.recommendationSearchUrl = "{% url 'recommendation:search_out_recommendation' %}?query=";
 </script>
 {% endblock meta%}
 {% block content %}
