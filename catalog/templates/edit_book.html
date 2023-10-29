@@ -1,0 +1,73 @@
+{% extends 'base.html' %} {% block content %}
+<!DOCTYPE html>
+<html style="background-color: #bcc6d4">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Edit Book</title>
+    <style>
+      h1 {
+        text-align: center;
+        font-size: 35px;
+        font-weight: bold;
+      }
+
+      form {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #0b6e4f;
+      }
+
+      th,
+      td {
+        border: 2px solid black;
+        padding: 10px;
+        text-align: left;
+        background-color: #0b6e4f;
+      }
+
+      th {
+        background-color: #0b6e4f;
+        text-align: center;
+        color: white;
+      }
+
+      /* Style the submit button */
+      input[type="submit"] {
+        background-color: #08a045;
+        border: 2px solid black;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        padding: 10px;
+        color: white;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Edit Book</h1>
+
+    <form method="POST">
+      {% csrf_token %}
+      <table>
+        {{ form.as_table }}
+        <tr>
+          <td></td>
+          <td>
+            <input type="submit" value="Edit Book" />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>
+{% endblock %}

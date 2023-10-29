@@ -29,18 +29,6 @@
         justify-content: flex-end;
       }
 
-      .ajax-button {
-        background-color: #024ebf;
-        border: 2px solid black;
-        cursor: pointer;
-        font-size: 16px;
-        width: 40%;
-        height: 30%;
-        color: white;
-        margin-left: 20px;
-        margin-top: 20px;
-      }
-
       body {
         background-color: #bcc6d4;
         padding-top: 100px;
@@ -156,7 +144,7 @@
               </div>
               <div class="mb-3">
                 <label for="title" class="col-form-label">Title:</label>
-                <input type="text" class="form-control" id="title" name="title"></input>  {# Perbaiki nama input menjadi 'title' #}
+                <input type="text" class="form-control" id="title" name="title"></input> 
               </div>
               <div class="mb-3">
                 <label for="author" class="col-form-label">Author:</label>
@@ -223,6 +211,9 @@
               <p class="card-text">${item.fields.author}</p>
               <p class="card-text">${item.fields.category}</p>
               <p class="card-text">${item.fields.year_of_published}</p>
+              {% if request.user.is_superuser %}
+              <a href="edit-book/${item.pk}" class="text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded-full">Edit Book</a>
+              {% endif %} 
             </div>
           </div>
         </div>
@@ -263,7 +254,7 @@
       .then((res) => res.json())
       .then((data) => {
         const productTable = document.getElementById("product_table");
-        productTable.innerHTML = ""; // Kosongkan elemen baris sebelum menambahkan kartu-kartu baru
+        productTable.innerHTML = ""; 
 
         if (data.books.length > 0) {
           data.books.forEach((book) => {
@@ -278,12 +269,15 @@
                     <p class="card-text">${book.author}</p>
                     <p class="card-text">${book.category}</p>
                     <p class="card-text">${book.year_of_published}</p>
+                    {% if request.user.is_superuser %}
+                    <a href="edit-book/${book.pk}" class="text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded-full">Edit Book</a>
+                    {% endif %} 
                   </div>
                 </div>
               </div>
             `;
 
-            productTable.innerHTML += card; // Tambahkan kartu ke dalam elemen baris
+            productTable.innerHTML += card;
           });
         } else {
           productTable.innerHTML = "<p>No books found.</p>";
@@ -291,8 +285,6 @@
       });
   }
 
-
-  // Event listener for the search form submission
   const searchForm = document.querySelector('form[action="{% url "catalog:search_books" %}"]');
   searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
