@@ -13,7 +13,6 @@ from django.db.models import Q
 import json
 
 # Create your views here.
-@login_required(login_url='/authentication/login/')
 def show_books(request):
     search_query = request.GET.get('q', '')
 

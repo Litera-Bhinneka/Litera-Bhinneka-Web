@@ -2,6 +2,7 @@
 {% load static %}
 {% block meta%}
 <title>Offer a User</title>
+<link rel="stylesheet" href="{% static 'css/exchange_offer_user.css' %}">
 {% endblock meta%}
 
 {% block content %}
@@ -95,7 +96,7 @@
             </div>
         </div>
         <div class="text-center">
-            <input type="submit" onclick="addOffer(this.getAttribute('data-username'))" data-username="{{user1.user.username}}" value="Send Offer" class="bg-blue-500 text-white rounded-lg p-2 mt-4 hover:bg-blue-700">
+            <input type="submit" onclick="addOffer(this.getAttribute('data-username'))" data-username="{{user1.user.username}}" value="Send Offer" class="custom-button">
         </div>
     </form>
     
@@ -125,5 +126,5 @@
 
 
 </div>
-<script defer src="{% static 'exchange_offer_user.js' %}"></script>
+<script defer src="{% static 'js/exchange_offer_user.js' %}"></script>
 {% endblock content %}
