@@ -99,6 +99,8 @@ async function refreshInventory(){
     const book_image = await getBookImages()
     const selectedElement = document.getElementById("owned_book");
     const selectedElement2 = document.getElementById("owned_book2");
+    const desc = document.getElementById("description");
+    const button = document.getElementById("submit-button");
     let firstItem;
     if (Array.isArray(books_title) && books_title.length > 1) {
         books_title.forEach((title, idx) => {
@@ -132,10 +134,13 @@ async function refreshInventory(){
         const option2 = document.createElement("option");
         option.text = "You must atleast has 2 books to recommend";
         option2.text = "You must atleast has 2 books to recommend";
+        desc.disabled = true;
+        desc.placeholder = "You must atleast has 2 books to recommend";
         selectedElement.appendChild(option);
         selectedElement2.appendChild(option2);
         selectedElement.disabled = true;
         selectedElement2.disabled = true;
+        button.disabled = true;
         document.getElementById("book-image").style.display = "none";
         document.getElementById("book-image2").style.display = "none";
         document.getElementById("label_owned_book2").textContent = "Choose a book similar to your book";
