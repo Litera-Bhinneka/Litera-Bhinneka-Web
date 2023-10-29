@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.core import serializers
 from review.forms import ReviewForm
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def show_review(request):
@@ -18,7 +19,7 @@ def show_review(request):
 
     return render(request, "show_review.html", context)
 
-
+@login_required(login_url='/authentication/login/')
 def see_book_review(request, id):
     book = get_object_or_404(Book, pk=id)
     reviews = Review.objects.filter(book_title=book.title).order_by('-review_date')
@@ -28,7 +29,7 @@ def see_book_review(request, id):
         'book': book,
         'reviews': reviews,
         'name': request.user.username,
-        'form':ReviewForm,
+        'form': ReviewForm,
         'wishlist': wishlist,
         'stars': (1,2,3,4,5)
     }

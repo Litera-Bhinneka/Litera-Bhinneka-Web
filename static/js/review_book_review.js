@@ -331,7 +331,7 @@ function toggleDisplay(elements, checkboxId) {
     var allUnchecked = true;
 
     // Check if any checkbox is checked
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    document.querySelectorAll('input[type="checkbox"].mr-2').forEach(checkbox => {
         if (checkbox.checked) {
             allUnchecked = false;
         }
