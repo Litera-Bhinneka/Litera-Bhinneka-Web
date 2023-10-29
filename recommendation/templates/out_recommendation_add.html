@@ -5,13 +5,16 @@
 <title>Recommendation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
 <link rel="stylesheet" href="{% static 'recommend_styles.css' %}">
+<script type="text/javascript">
+    window.recommendationUrl = "{% url 'recommendation:get_out_recommendation_json' %}";
+</script>
 {% endblock meta%}
 {% block content %}
 <div id="div-form" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full h-full p-4 overflow-x-hidden overflow-y-auto">
     <div class="relative w-full max-w-md bg-white rounded-lg shadow-lg dark:bg-gray-700">
         <div class="px-6 py-6 lg:px-8">
             <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Add your recommendation outside our book catalog!</h3>
-            <form id="p-form">
+            <form id="p-form" method="POST">
                 {% csrf_token %}
                 <div >
                     <label for="out_book_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">The book you want to recommend for</label>
@@ -33,22 +36,5 @@
         </div>
     </div>
 </div>
-<!-- <div class="text-center mt-10" id="div-form">
-    <form id="p-form">
-        {% csrf_token %}
-        <div >
-            <label for="out_book_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">The book you want to recommend for</label>
-            {{ form.out_book_title }}
-        </div>
-        <div>
-            <label for="another_out_book_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Book that is similar to your recommended book</label>
-            {{ form.another_out_book_title }}
-        </div>
-        <div>
-            <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Book that is similar to your recommended book</label>
-            {{ form.out_description }}
-        </div>
-    </form>
-</div> -->
 <script defer src="{% static 'out_recommend_add_script.js' %}"></script>
 {% endblock content %}
