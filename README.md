@@ -16,25 +16,25 @@ Aplikasi ini menawarkan kemudahan bagi pengguna untuk menemukan buku yang mereka
 Melalui fitur-fitur yang disediakan, aplikasi ini tidak hanya mempermudah pertukaran buku, tetapi juga memberikan manfaat yang signifikan bagi pengguna dan masyarakat secara keseluruhan.
 
 ## Daftar Modul 📃
-### 1. Homepage
+### 1. Homepage - Andhika Reihan Hervito dan Ghana Ahmad Yudistira
 Di halaman ini, pengguna dapat melihat pilihan modul yang tersedia melalui desain *card*.
 
-### 2. Halaman Login dan Register
+### 2. Halaman Login dan Register - Andhika Reihan Hervito dan Ghana Ahmada Yudistira
 Pada halaman ini, terdapat formulir untuk masuk ke sistem aplikasi, yang dapat diakses oleh administrator dan pengguna yang telah masuk ke dalam akun mereka. Selain itu, terdapat opsi untuk membuat akun baru dengan mengklik tautan yang mengarahkan pengguna ke halaman pendaftaran.
 
-### 3. Book Catalog
+### 3. Book Catalog - Catherine Hana Natalie
 Dalam modul `Book Catalog`, pengguna dapat menjelajahi daftar buku yang tersedia untuk pertukaran dan melakukan pencarian berdasarkan judul, penulis, atau kategori. Mereka memiliki akses ke informasi detail buku, termasuk deskripsi, penulis, dan status ketersediaan. Pengguna dapat menambahkan buku yang tidak terdapat katalog. Di sisi lain, admin memiliki kontrol penuh atas katalog buku dengan kemampuan untuk menambahkan buku baru, mengelola status ketersediaan buku, dan menghapus buku dari katalog.
 
-### 4. Book Exchange
+### 4. Book Exchange - Muhammad Raihan Akbar
 Dalam modul `Book Exchange`, pengguna memiliki kemampuan untuk membuat permintaan pertukaran buku dengan pengguna lain melalui sistem permintaan online. Pengguna mengisi detail buku yang ingin ditukar dan mengirimkan permintaan kepada pemilik buku yang diinginkan. Setelahnya, pengguna dapat melihat permintaan yang diterima dan memiliki opsi untuk menerima atau menolaknya. Jika permintaan diterima, pertukaran buku dapat dilakukan dengan pengguna yang diminta. Pengguna yang menerima permintaan harus mengonfirmasi pertukaran, mengikuti petunjuk langkah demi langkah yang diberikan oleh sistem, termasuk lokasi pertemuan, waktu, dan instruksi khusus jika ada.
 
-### 5. Review Buku
+### 5. Review Buku - Ghana Ahmada Yudistira
 Dalam modul `Review Buku`, pengguna memiliki beberapa fungsi penting. Pertama, mereka dapat melihat semua ulasan dan komentar pengguna lain mengenai buku tertentu, termasuk penilaian bintang, memberi mereka wawasan sebelum membaca buku tersebut. Pengguna juga dapat menulis ulasan dan memberikan penilaian bintang terhadap buku yang telah mereka baca, memberikan komentar, kesan, serta saran kepada pengguna lain yang mungkin tertarik dengan buku tersebut. Selain itu, pengguna memiliki kemampuan untuk memberikan respon atau tanggapan terhadap ulasan yang diposting oleh pengguna lain, memungkinkan interaksi dan berbagi pengalaman di antara komunitas pembaca. Pengguna juga dapat melihat peringkat buku berdasarkan ulasan pengguna, yang dihitung berdasarkan rata-rata penilaian bintang.
 
-### 6. Rekomendasi Buku
+### 6. Rekomendasi Buku - Andhika Reihan Hervito
 Dalam modul `Rekomendasi Buku`, Pengguna memiliki opsi untuk membuat rekomendasi buku. Rekomendasi ini terdiri dari dua buku, sehingga jika pengguna menikmati suatu buku A, kemungkinan besar pengguna juga akan menyukai suatu buku B yang direkomendasi oleh pengguna lain. Selain itu, pengguna juga bisa membuat rekomendasi baru yang nantinya akan tampil di laman tersebut.
 
-### 7. Informasi Pengguna
+### 7. Informasi Pengguna - Muhammad Rafli Darmawan
 Dalam modul `Informasi Pengguna`,  Pengguna juga memiliki opsi untuk menambahkan buku yang diminati ke dalam wishlist mereka untuk ditukar di masa mendatang, dan pengguna memiliki kemampuan untuk melihat buku-buku yang mereka simpan dalam *wishlist*, memberikan gambaran tentang buku-buku yang menarik minat mereka. Mereka juga dapat melihat koleksi buku yang dimiliki, memberikan wawasan tentang buku-buku yang telah mereka baca atau miliki. Selain itu, pengguna memiliki akses ke histori pertukaran buku, memungkinkan mereka melihat catatan transaksi pertukaran sebelumnya.
 
 
@@ -52,6 +52,10 @@ User memiliki otoritas untuk mengakses welcome page, menambahkan buku ke katalog
 ### 2. Admin
 
 Admin atau administrator berperan sebagai pemegang kendali website dan memiliki akses penuh untuk memodifikasi buku, rekomendasi, dan melihat user database melalui dashboard admin.
+
+### 3. Guest
+
+Guest atau user yang belum log in hanya memiliki kekuatan mengakses yang paling rendah
 
 ## User Diagram 📊
 
