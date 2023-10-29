@@ -20,8 +20,7 @@ nav{
 }
 .love-widget label {
     font-size: 30px;
-    color: #c4c4c4;
-    padding: 7px;
+    color: #afafaf;
     float: right;
     transition: all 0.2s ease;
     cursor: pointer; /* Add cursor pointer to indicate it's clickable */

@@ -112,6 +112,22 @@
                     messageRating = "ratings";
                 }
             }
+
+            let showText;
+            let hiddenText;
+            let exceed;
+            console.log(book[0].fields.description.length)
+            if (book[0].fields.description.length > 250) {
+                exceed = true;
+                let reversedSubstring = book[0].fields.description.substring(250).split('').reverse().join(''); 
+                let spaceIndex = reversedSubstring.indexOf(" "); 
+
+                let sepIdx = spaceIndex !== -1 ? 250 - spaceIndex : 0; 
+                showText = book[0].fields.description.substring(0, sepIdx);
+                hiddenText = book[0].fields.description.substring(sepIdx, book[0].fields.description.length);
+            } else {
+                exceed = false;
+            }
             
             let htmlString = '';
             let truncatedDesc = book[0].fields.description.split(' ').slice(0, 50).join(' ');
@@ -127,7 +143,8 @@
                     </div>
                     <div class="my-4 border-t border-solid border-gray-600 border-t-4 border-opacity-75 mx-0 w-full"></div>
                     <div class="mb-4">
-                        <p class="text-gray-700">${truncatedDesc}</p>
+                        <p class="text-gray-700 text-base">${exceed ? showText + `<span class="text-gray-700 text-base" id="dots-1">` + `<span id="realDots-1">...</span>`+ `<button onclick="readMore(-1)" id="readMoreBtn-1" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Read More</button>` +`<span class="text-gray-700 text-base" id="more-1" style="display: none;">${hiddenText}</span>` + `</span>` : book[0].fields.description}</p>
+                        ${exceed ? `<button onclick="readMore(-1)" id="readLessBtn-1" class="text-blue-500 hover:text-blue-700 text-sm font-medium" style="display: none;">Read less</button>` : ''}
                     </div>
                     <div class="mb-4 flex items-center">
                         <span class="mr-2">${avgRating.toFixed(1)}</span>
@@ -159,7 +176,8 @@
                             <label for="wishlist" class="fa fa-heart cursor-pointer" onclick="initializeLoveButton(${book[0].pk})"></label>
                         </div>
                     </div>
-                </div>`;
+                </div>`;       
+
             
             const starRatingWrapper = document.querySelector('.star-rating');
             const frontStars =  document.querySelector('.front-stars');
@@ -170,6 +188,14 @@
                 frontStars.style.width = percentage;
             };
             container.innerHTML = htmlString;
+
+            if (wishlist.length >= 1) {
+                // Auto check the wishlist checkbox
+                document.getElementById('wishlist').checked = true;
+            } else {
+                // Wishlist is empty, checkbox remains unchecked (default state)
+                document.getElementById('wishlist').checked = false;
+            }
         }
 
         async function refreshReviews() {
@@ -427,7 +453,7 @@
                         "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value,
                         }
                     })
-                    $(this).next('label').css('color', '#c4c4c4');
+                    $(this).next('label').css('color', '#afafaf');
                 }
             });
         }
