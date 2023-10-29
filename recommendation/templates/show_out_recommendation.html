@@ -8,6 +8,7 @@
     window.recommendationUrl = "{% url 'recommendation:get_out_recommendation_json' %}";
     window.recommendationSearchUrl = "{% url 'recommendation:search_out_recommendation' %}?query=";
 </script>
+<div id="auth-status" data-is-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"></div>
 {% endblock meta%}
 {% block content %}
 <div class="text-center" id="judul">
@@ -16,10 +17,18 @@
     <p class="judul-desc">Outside our catalog</p>
 </div>
 <div class="">
+    {% if user.is_authenticated %}
     <button class="custom-button" type="button" id="add-button">
         Write Recommendation
     </button>
+    {% else %}
+    <button class="custom-button" id="logged-button" type="button">
+        Write Recommendation
+    </button>
+    <div id="messageDiv" class="ml-5 mt-4"></div>
+    {% endif %}
 </div>
+{% if user.is_authenticated %}
 <div class="justify-center mt-4 ml-4 mr-4">
     <form id="searchForm" class="relative">
         <label for="default-search" class="sr-only">Search</label>
@@ -40,6 +49,9 @@
 
 <div class="flex flex-wrap card-container" id="card-container">
 </div>
+{% else %}
+<div class="flex flex-wrap card-container" id="card-container"></div>
+{% endif %}
 
 <br>
 <script defer src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

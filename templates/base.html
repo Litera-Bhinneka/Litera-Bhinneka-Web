@@ -23,12 +23,22 @@
                 <h1 class="text-2xl font-bold">LITERA</h1>
             </a>
             <div class="mx-6 flex items-center gap-8">
-                <span class="text-lg">Hi, <strong>{{ name }}</strong></span>
-                <a href="{% url 'authentication:logout' %}">
-                    <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
-                        Logout
-                    </button>
-                </a>
+                {% if user.is_authenticated %}
+                    <span class="text-lg">Hi, <strong>{{ name }}</strong></span>
+                    <a href="{% url 'authentication:logout' %}">
+                        <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
+                            Logout
+                        </button>
+                    </a>
+                {% else %}
+                    <span class="text-lg">You're a guest</span>
+                    <a href="{% url 'authentication:login' %}">
+                        <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
+                            Login
+                        </button>
+                    </a>
+                    <!-- Add your login link here -->
+                {% endif %}
             </div>
           </nav>
         {% block content %}

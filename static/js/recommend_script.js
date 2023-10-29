@@ -1,3 +1,9 @@
+
+
+var isUserAuthenticated = document.getElementById('auth-status').dataset.isAuthenticated === 'true';
+
+if (isUserAuthenticated) {
+    
 async function getRecommendations() {
     return fetch(window.recommendationUrl).then((res) => res.json())
 }
@@ -282,5 +288,29 @@ document.getElementById("searchForm").addEventListener("submit", function (event
     // You can further customize the HTML structure based on your needs
 });
 
-refreshInventory()
-refreshRecommendations()
+    refreshInventory()
+    refreshRecommendations()
+} else {
+    document.getElementById("logged-button").addEventListener("click", function() {
+        var paragraph = document.createElement("p");
+        paragraph.className = "text-sm text-gray-500";
+        paragraph.textContent = "You need to login first to write a recommendation";
+    
+        var messageDiv = document.getElementById("messageDiv");
+    
+        messageDiv.innerHTML = "";
+    
+        messageDiv.appendChild(paragraph);
+    });
+    document.getElementById("card-container").innerHTML = ""
+    let htmlString = ''
+        htmlString += `
+        <div class="w-full p-4 mb-4">
+            <div class="card text-center">
+                <div class="card-text flex items-center justify-center mb-1">
+                    You need to log in to see user recommendations
+                </div>
+            </div>
+        </div>`
+    document.getElementById("card-container").innerHTML = htmlString;
+}
