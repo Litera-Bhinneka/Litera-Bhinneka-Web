@@ -355,18 +355,18 @@ function toggleDisplay(elements, checkboxId) {
 function initializeLoveButton(book_id) {
     $('.love-widget input[name="wishlist"]').click(function() {
         if ($(this).is(':checked')) {
-            fetch("{% url 'manage_user:add_wishlist' book_id=book.id %}", {
+            fetch(window.addWishlistUrl, {
                 method: "POST",
                 headers: {
-                "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                "X-CSRFToken": csrfToken,
                 }
             })
             $(this).next('label').css('color', 'rgb(213, 52, 52)');
         } else {
-            fetch("{% url 'manage_user:remove_wishlist' book_id=book.id %}", {
+            fetch(window.deleteWishlistUrl, {
                 method: "DELETE",
                 headers: {
-                "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                "X-CSRFToken": csrfToken,
                 }
             })
             $(this).next('label').css('color', '#afafaf');

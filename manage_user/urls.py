@@ -1,7 +1,7 @@
 from django.urls import path
 from manage_user.views import user_page
 from manage_user.views import add_to_inventory
-from manage_user.views import get_book_json, increment_book_ajax, add_wishlist, remove_wishlist, show_wishlist, show_inventory, get_wishlist_json
+from manage_user.views import get_book_json, increment_book_ajax, add_wishlist, remove_wishlist, show_wishlist, show_inventory, get_wishlist_json, remove_wishlist_sec
 app_name = 'manage_user'
 
 urlpatterns = [
@@ -14,5 +14,6 @@ urlpatterns = [
     path('remove-wishlist/<int:book_id>/', remove_wishlist, name='remove_wishlist'),
     path('get-wishlist-json/', get_wishlist_json, name='get_wishlist_json'),
     path('show-wishlist/', show_wishlist, name='show_wishlist'),
-    path('show-inventory/', show_inventory, name='show_inventory')
+    path('show-inventory/', show_inventory, name='show_inventory'),
+    path('remove-wishlist-sec/<int:book_id>/', remove_wishlist_sec, name='remove_wishlist_sec'),
 ]

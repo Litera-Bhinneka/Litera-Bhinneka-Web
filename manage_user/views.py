@@ -72,6 +72,15 @@ def add_wishlist(request, book_id):
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
 
+def remove_wishlist_sec(request, book_id):
+    if request.method == "DELETE":
+        wishlist_items = Wishlist.objects.filter(user=request.user, book__pk=book_id)
+        print(wishlist_items)
+        wishlist_items.delete()
+        return HttpResponse(b"OK", status=200)
+    
+    return HttpResponseNotFound(b"Method not allowed for this endpoint", status=405)
+
 @login_required(login_url='/authentication/login/')
 def remove_wishlist(request, book_id):
     user = request.user
