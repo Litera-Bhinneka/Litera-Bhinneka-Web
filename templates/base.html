@@ -24,12 +24,26 @@
             </a>
             <div class="mx-6 flex items-center gap-8">
                 {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                    <span class="text-lg">You're an admin</strong></span>
+                    <a href="{% url 'admin:index' %}">
+                        <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
+                            Admin Page
+                        </button>
+                    </a>
+                    <a href="{% url 'authentication:logout' %}">
+                        <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
+                            Logout
+                        </button>
+                    </a>
+                {% else %}
                     <span class="text-lg">Hi, <strong>{{ name }}</strong></span>
                     <a href="{% url 'authentication:logout' %}">
                         <button class="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded-full">
                             Logout
                         </button>
                     </a>
+                {% endif %}
                 {% else %}
                     <span class="text-lg">You're a guest</span>
                     <a href="{% url 'authentication:login' %}">
