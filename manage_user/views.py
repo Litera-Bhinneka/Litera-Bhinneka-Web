@@ -6,8 +6,9 @@ from django.urls import reverse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django import template
 
+register = template.Library()
 
 # Create your views here.
 def user_page(request):
@@ -108,23 +109,22 @@ def show_wishlist(request):
     }
 
     return render(request, "show_wishlist.html", context)
+
+
+@register.filter(name='get_dict_value')
+def get_dict_value(dictionary, key):
+    return dictionary.get(key, 0)  # Return 0 if key is not found
         
 # Fungsi untuk menampilkan inventory user
-@login_required(login_url='/authentication/login/')
+@login_required(login_url='/authentication/login/')       
 def show_inventory(request):
     user = request.user
     inventory_books = Inventory.objects.filter(user=user)
-    
-    # Menggunakan annotate untuk menghitung jumlah buku dalam inventory
-    books = Book.objects.filter(pk__in=inventory_books.values('book'))
     context = {
-        'books': books,
         'name': request.user.username,
-        'inventory': {i.book.pk :i for i in inventory_books}
+        'inventory': inventory_books,
     }
-    print(context['inventory'])
-    return render(request, "show_inventory.html", context)
 
-        
+    return render(request, "show_inventory.html", context)
 
 
