@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block meta%}
+<title>Recommendation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
+<link rel="stylesheet" href="{% static 'recommend_styles.css' %}">
+{% endblock meta%}
+{% block content %}
+<div class="text-center mt-10" id="out_judul">
+    <button class="custom-button" type="button" id="inCatalogButton">
+        User recommendations in our catalog
+    </button>
+    <button class="custom-button" type="button" id="outsideCatalogButton">
+        User recommendations outside our catalog
+    </button>
+</div>
+<script defer src="{% static 'recommend_main.js' %}"></script>
+{% endblock content %}
