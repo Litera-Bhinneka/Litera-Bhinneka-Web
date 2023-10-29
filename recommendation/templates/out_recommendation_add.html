@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block meta%}
+<title>Recommendation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;700&display=swap">
+<link rel="stylesheet" href="{% static 'recommend_styles.css' %}">
+{% endblock meta%}
+{% block content %}
+<div class="text-center mt-10" id="div-form">
+    <form id="p-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+    </form>
+</div>
+<script defer src="{% static 'outside_recommend_add_script.js' %}"></script>
+{% endblock content %}

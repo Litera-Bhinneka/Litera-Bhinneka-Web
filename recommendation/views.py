@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from .models import Recommendation
+from .models import OutsideRecommendation, Recommendation
 from catalog.models import Book
 from manage_user.models import Inventory
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, JsonResponse
-from .forms import RecommendationForm
+from .forms import RecommendationForm, OutsideRecommendationForm
 from django.core import serializers
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -13,6 +13,13 @@ from django.db.models import Q
 
 # Create your views here.
 @login_required(login_url='/authentication/login/')
+def show_main(request):
+    context = {
+        'name': request.user.username
+    }
+    return render(request, 'show_main.html', context)
+
+@login_required(login_url='/authentication/login/')
 def show_recommendation(request):
     recommendations = Recommendation.objects.all().values()
     context = {
@@ -21,6 +28,14 @@ def show_recommendation(request):
     }
     return render(request, 'show_recommendation.html', context)
 
+@login_required(login_url='/authentication/login/')
+def show_out_recommendation(request):
+    outside_recommendations = OutsideRecommendation.objects.all().values()
+    context = {
+        'outside_recommendations': outside_recommendations,
+        'name': request.user.username
+    }
+    return render(request, 'show_out_recommendation.html', context)
 @csrf_exempt
 def add_recommendation(request):
     form = RecommendationForm(request.POST or None)
@@ -51,6 +66,7 @@ def add_recommendation_ajax(request, bookId1, bookId2):
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
 
+@login_required(login_url='/authentication/login/')
 def search_recommendation(request):
     if request.method == 'GET':
         query = request.GET.get('query', '')
@@ -66,7 +82,18 @@ def search_recommendation(request):
         return JsonResponse({'recommendations': recs_list})
     else:
         return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400)
-    
+
+def outside_recommendation_add(request):
+    form = OutsideRecommendationForm(request.POST or None)
+
+    # if form.is_valid() and request.method == "POST":
+    #     outside_recommendation = form.save(commit=False)
+    #     outside_recommendation.save()
+    #     return HttpResponseRedirect(reverse('recommendation:show_recommendation'))
+
+    context = {'form': form, 'name': request.user.username}
+    return render(request, "out_recommendation_add.html", context)
+
 def get_user_inventory_json(request):
     user = request.user
     inventory = Inventory.objects.filter(user=user)
@@ -94,3 +121,7 @@ def get_book_ids(request):
 def get_recommendation_json(request):
     rec = Recommendation.objects.all()
     return HttpResponse(serializers.serialize('json', rec))
+
+def get_out_recommendation_json(request):
+    out_rec = OutsideRecommendation.objects.all()
+    return HttpResponse(serializers.serialize('json', out_rec))
