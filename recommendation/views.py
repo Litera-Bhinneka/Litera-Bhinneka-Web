@@ -86,16 +86,20 @@ def search_recommendation(request):
 @login_required(login_url='/authentication/login/')
 @csrf_exempt
 def outside_recommendation_add(request):
-    form = OutsideRecommendationForm(request.POST or None)
-    data = {}
-    if form.is_valid():
-        form.save()
-        data['name'] = form.cleaned_data.get('out_book_title')
-        data['another_name'] = form.cleaned_data.get('another_out_book_title')
-        return JsonResponse(data)
-
-    context = {'form': form, 'name': request.user.username}
-    return render(request, "out_recommendation_add.html", context)
+    if request.method == 'POST':
+        form = OutsideRecommendationForm(request.POST or None)
+        if form.is_valid():
+            rec = form.save(commit=False)
+            rec.out_recommender_name = request.user.username
+            rec.save()
+            return JsonResponse({"message": "success"}, status=201)
+        else:
+            print("data invalid")
+            return JsonResponse({"error": form.errors}, status=400)
+    else:
+        form = OutsideRecommendationForm()
+        context = {'form': form, 'name': request.user.username}
+        return render(request, "out_recommendation_add.html", context)
 
 def get_user_inventory_json(request):
     user = request.user

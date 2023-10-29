@@ -250,7 +250,7 @@ def accept_offer(request, id):
 def schedule_meet(request, id):
     if request.method == 'POST':
         form = MeetForm(request.POST)
-
+        print(form)
         if form.is_valid():
             meet = form.save(commit=False)
             meet.sender = request.user

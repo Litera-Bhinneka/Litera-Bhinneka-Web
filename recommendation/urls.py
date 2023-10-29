@@ -15,6 +15,6 @@ urlpatterns = [
     path('add_recommendation_ajax/<int:bookId1>/<int:bookId2>/', add_recommendation_ajax, name='add_recommendation_ajax'),
     path('search-recommendation/', search_recommendation, name='search_recommendation'),
     path('get-book-ids/', get_book_ids, name='get_book_ids'),
-    path('show-out-recommendation/outside-recommendation-add/', outside_recommendation_add, name='outside_recommendation_add'),
+    path('outside-recommendation-add/', outside_recommendation_add, name='outside_recommendation_add'),
     path('get-out-recommendation-json/', get_out_recommendation_json, name='get_out_recommendation_json'),
 ]
