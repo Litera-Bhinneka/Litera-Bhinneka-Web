@@ -1,6 +1,9 @@
 # Litera - Web
 Aplikasi pertukaran buku berbasis website dengan fitur daftar katalog buku, review buku, permintaan pertukaran buku secara online, rekomendasi buku, dan informasi pengguna. 
 
+# Link
+Link to Website: [LINK](litera-b06-tk-tutorial.pbp.cs.ui.ac.id)
+
 ## Anggota Kelompok👥
 - Andhika Reihan Hervito (2206826324)
 - Catherine Hana Natalie (2206083123)
