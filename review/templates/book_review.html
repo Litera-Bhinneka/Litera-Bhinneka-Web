@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-
-
+{% load static %}
 {% load widget_tweaks %}
+
 
 
 {% block content %}
@@ -27,6 +27,20 @@
         }
         .star-widget input:checked ~ label{
             color: #fd4;
+        }
+        .love-widget label {
+            font-size: 30px;
+            color: #c4c4c4;
+            padding: 7px;
+            float: right;
+            transition: all 0.2s ease;
+            cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+        }
+
+        .love-widget input:not(:checked) ~ label:hover,
+        .love-widget input:not(:checked) ~ label:hover ~ label,
+        .love-widget input:checked ~ label {
+            color: rgb(213, 52, 52);
         }
         #book_image{
             background-color: #cad1da;
@@ -194,12 +208,16 @@
 
     {% csrf_token %}
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         async function getReviews() {
             return fetch("{% url 'review:get_review_json' book_id=book.id %}").then((res) => res.json())
         }
         async function getBook(){
             return fetch("{% url 'review:get_book_json' book_id=book.id %}").then((res) => res.json())
+        }
+        async function getWishlist(){
+            return fetch("{% url 'review:get_wishlist_json' book_id=book.id %}").then((res) => res.json())
         }
         async function showBook() {
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -208,6 +226,7 @@
             
             const book = await getBook();
             const reviews = await getReviews();
+            const wishlist = await getWishlist();
             let messageRating = "rating"
             let avgRating = 0;
 
@@ -263,6 +282,10 @@
                         <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" data-bs-target="#add-review-modal" class="custom-button" type="button" onclick="toggleModal()">
                             Add Review
                         </button>
+                        <div class="love-widget">
+                            <input type="checkbox" name="wishlist" value="yes" class="hidden" id="wishlist">
+                            <label for="wishlist" class="fa fa-heart cursor-pointer" onclick="initializeLoveButton(${book[0].pk})"></label>
+                        </div>
                     </div>
                 </div>`;
             
@@ -515,6 +538,32 @@
                 elements[i].style.display = shouldHide ? 'block' : 'none';
             }
         }
+        function initializeLoveButton(book_id) {
+            $('.love-widget input[name="wishlist"]').click(function() {
+                if ($(this).is(':checked')) {
+                    fetch("{% url 'manage_user:add_wishlist' book_id=book.id %}", {
+                        method: "POST",
+                        headers: {
+                        "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                        }
+                    })
+                    $(this).next('label').css('color', 'rgb(213, 52, 52)');
+                } else {
+                    fetch("{% url 'manage_user:remove_wishlist' book_id=book.id %}", {
+                        method: "DELETE",
+                        headers: {
+                        "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                        }
+                    })
+                    $(this).next('label').css('color', '#c4c4c4');
+                }
+            });
+        }
+
+        // Call the function to initialize the love button behavior
+        $(document).ready(function() {
+            initializeLoveButton();
+        });
 
         
         showBook()
