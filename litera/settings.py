@@ -48,6 +48,12 @@ INSTALLED_APPS = [
     'crispy_forms',
     'widget_tweaks',
     "crispy_tailwind",
+    "guest_user",
+]
+
+AUTHENTICATION_BACKENDS = [
+   "django.contrib.auth.backends.ModelBackend",
+   "guest_user.backends.GuestBackend",
 ]
 
 MIDDLEWARE = [
