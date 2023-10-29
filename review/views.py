@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from review.models import Review
 from catalog.models import Book
+from manage_user.models import Wishlist
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from review.forms import ReviewForm
 from django.urls import reverse
@@ -21,12 +22,14 @@ def show_review(request):
 def see_book_review(request, id):
     book = get_object_or_404(Book, pk=id)
     reviews = Review.objects.filter(book_title=book.title).order_by('-review_date')
+    wishlist = Wishlist.objects.filter(user=request.user, book=book)
 
     context = {
         'book': book,
         'reviews': reviews,
         'name': request.user.username,
         'form':ReviewForm,
+        'wishlist': wishlist,
         'stars': (1,2,3,4,5)
     }
 
@@ -55,6 +58,10 @@ def get_review_json(request, book_id):
 def get_book_json(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
     return HttpResponse(serializers.serialize('json', [book]))
+
+def get_wishlist_json(request, book_id):
+    wishlist = Wishlist.objects.filter(user=request.user, book=book_id)
+    return HttpResponse(serializers.serialize('json', wishlist))
 
 
 @csrf_exempt
