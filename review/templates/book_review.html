@@ -15,6 +15,7 @@
     <script type="text/javascript">
         const csrfToken = "{{ csrf_token }}";
         window.book_id = "{{ book.id }}";
+        window.deleteWishlistUrl = "{% url 'manage_user:remove_wishlist' book_id=book.id %}"
     </script>
 
     <div class="m-4">
@@ -85,6 +86,10 @@
     {% csrf_token %}
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script defer src="{% static 'js/review_book_review.js' %}"></script>
+<script defer src="{% static 'js/review_book_review.js' %}">
+
+
+
+</script>
     
 {% endblock content %}
