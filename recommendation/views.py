@@ -12,14 +12,12 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
 # Create your views here.
-# @login_required(login_url='/authentication/login/')
 def show_main(request):
     context = {
         'name': request.user.username
     }
     return render(request, 'show_main.html', context)
 
-# @login_required(login_url='/authentication/login/')
 def show_recommendation(request):
     recommendations = Recommendation.objects.all().values()
     context = {
@@ -28,7 +26,6 @@ def show_recommendation(request):
     }
     return render(request, 'show_recommendation.html', context)
 
-# @login_required(login_url='/authentication/login/')
 def show_out_recommendation(request):
     outside_recommendations = OutsideRecommendation.objects.all().values()
     context = {
@@ -54,7 +51,10 @@ def add_recommendation(request):
 def add_recommendation_ajax(request, bookId1, bookId2):
     form = RecommendationForm(request.POST or None)
     if request.method == 'POST':
-        recommender_name = request.user.username
+        if request.user.is_staff:
+            recommender_name = "admin"
+        else:
+            recommender_name = request.user.username
         description = request.POST.get("description_text")
         book_title1 = get_object_or_404(Book, pk=bookId1).title
         book_title2 = get_object_or_404(Book, pk=bookId2).title
@@ -66,7 +66,6 @@ def add_recommendation_ajax(request, bookId1, bookId2):
         return HttpResponse(b"CREATED", status=201)
     return HttpResponseNotFound()
 
-# @login_required(login_url='/authentication/login/')
 def search_recommendation(request):
     if request.method == 'GET':
         query = request.GET.get('query', '')
@@ -102,7 +101,10 @@ def outside_recommendation_add(request):
         form = OutsideRecommendationForm(request.POST or None)
         if form.is_valid():
             rec = form.save(commit=False)
-            rec.out_recommender_name = request.user.username
+            if request.user.is_staff:
+                rec.out_recommender_name = "admin"
+            else:
+                rec.out_recommender_name = request.user.username
             rec.save()
             return JsonResponse({"message": "success"}, status=201)
         else:
