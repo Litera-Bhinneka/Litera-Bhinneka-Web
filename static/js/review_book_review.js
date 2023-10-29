@@ -1,8 +1,11 @@
 async function getReviews() {
-    return fetch("{% url 'review:get_review_json' book_id=book.id %}").then((res) => res.json())
+    return fetch("/review/get-review-json/" + window.book_id + "/").then((res) => res.json())
 }
 async function getBook(){
-    return fetch("{% url 'review:get_book_json' book_id=book.id %}").then((res) => res.json())
+    return fetch("/review/get-book-json/" + window.book_id + "/").then((res) => res.json())
+}
+async function getWishlist(){
+    return fetch("/review/get-wishlist-json/" + window.book_id + "/").then((res) => res.json())
 }
 async function showBook() {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -11,6 +14,7 @@ async function showBook() {
     
     const book = await getBook();
     const reviews = await getReviews();
+    const wishlist = await getWishlist();
     let messageRating = "rating"
     let avgRating = 0;
 
@@ -23,6 +27,22 @@ async function showBook() {
         if (reviews.length > 1) {
             messageRating = "ratings";
         }
+    }
+
+    let showText;
+    let hiddenText;
+    let exceed;
+    console.log(book[0].fields.description.length)
+    if (book[0].fields.description.length > 250) {
+        exceed = true;
+        let reversedSubstring = book[0].fields.description.substring(250).split('').reverse().join(''); 
+        let spaceIndex = reversedSubstring.indexOf(" "); 
+
+        let sepIdx = spaceIndex !== -1 ? 250 - spaceIndex : 0; 
+        showText = book[0].fields.description.substring(0, sepIdx);
+        hiddenText = book[0].fields.description.substring(sepIdx, book[0].fields.description.length);
+    } else {
+        exceed = false;
     }
     
     let htmlString = '';
@@ -39,7 +59,8 @@ async function showBook() {
             </div>
             <div class="my-4 border-t border-solid border-gray-600 border-t-4 border-opacity-75 mx-0 w-full"></div>
             <div class="mb-4">
-                <p class="text-gray-700">${truncatedDesc}</p>
+                <p class="text-gray-700 text-base">${exceed ? showText + `<span class="text-gray-700 text-base" id="dots-1">` + `<span id="realDots-1">...</span>`+ `<button onclick="readMore(-1)" id="readMoreBtn-1" class="text-blue-500 hover:text-blue-700 text-sm font-medium">Read More</button>` +`<span class="text-gray-700 text-base" id="more-1" style="display: none;">${hiddenText}</span>` + `</span>` : book[0].fields.description}</p>
+                ${exceed ? `<button onclick="readMore(-1)" id="readLessBtn-1" class="text-blue-500 hover:text-blue-700 text-sm font-medium" style="display: none;">Read less</button>` : ''}
             </div>
             <div class="mb-4 flex items-center">
                 <span class="mr-2">${avgRating.toFixed(1)}</span>
@@ -66,8 +87,13 @@ async function showBook() {
                 <button data-modal-target="add-review-modal" data-modal-toggle="add-review-modal" data-bs-target="#add-review-modal" class="custom-button" type="button" onclick="toggleModal()">
                     Add Review
                 </button>
+                <div class="love-widget">
+                    <input type="checkbox" name="wishlist" value="yes" class="hidden" id="wishlist">
+                    <label for="wishlist" class="fa fa-heart cursor-pointer" onclick="initializeLoveButton(${book[0].pk})"></label>
+                </div>
             </div>
-        </div>`;
+        </div>`;       
+
     
     const starRatingWrapper = document.querySelector('.star-rating');
     const frontStars =  document.querySelector('.front-stars');
@@ -78,6 +104,14 @@ async function showBook() {
         frontStars.style.width = percentage;
     };
     container.innerHTML = htmlString;
+
+    if (wishlist.length >= 1) {
+        // Auto check the wishlist checkbox
+        document.getElementById('wishlist').checked = true;
+    } else {
+        // Wishlist is empty, checkbox remains unchecked (default state)
+        document.getElementById('wishlist').checked = false;
+    }
 }
 
 async function refreshReviews() {
@@ -318,6 +352,32 @@ function toggleDisplay(elements, checkboxId) {
         elements[i].style.display = shouldHide ? 'block' : 'none';
     }
 }
+function initializeLoveButton(book_id) {
+    $('.love-widget input[name="wishlist"]').click(function() {
+        if ($(this).is(':checked')) {
+            fetch("{% url 'manage_user:add_wishlist' book_id=book.id %}", {
+                method: "POST",
+                headers: {
+                "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                }
+            })
+            $(this).next('label').css('color', 'rgb(213, 52, 52)');
+        } else {
+            fetch("{% url 'manage_user:remove_wishlist' book_id=book.id %}", {
+                method: "DELETE",
+                headers: {
+                "X-CSRFToken": document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                }
+            })
+            $(this).next('label').css('color', '#afafaf');
+        }
+    });
+}
+
+// Call the function to initialize the love button behavior
+$(document).ready(function() {
+    initializeLoveButton();
+});
 
 
 showBook()
