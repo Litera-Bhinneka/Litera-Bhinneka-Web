@@ -1,0 +1,76 @@
+.owner-info {
+    display: flex;
+    justify-content: space between;
+    align-items: center;
+}
+.profile-image {
+    width: 48px; /* Adjust the width as needed */
+    height: 48px; /* Adjust the height as needed */
+    border-radius: 50%;
+    margin-right: 8px; /* Add spacing between image and username */
+}
+
+.custom-button {
+    color: White;
+    background-image: linear-gradient(to bottom right, #68D391, #4299E1);
+    transition: background-image 0.3s, box-shadow 0.3s;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    font-family: "Dosis", bold;
+    padding: 8px 12px;
+    text-align: center;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-left: 20px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.custom-button:hover {
+    background-image: linear-gradient(to bottom left, #8E24AA, #4299E1);
+    box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.1);
+}
+
+.custom-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.2);
+}
+
+.dark .custom-button:focus {
+    box-shadow: 0 0 0 4px rgba(45, 148, 72, 0.2);
+}
+
+.see-owner {
+    margin-top: auto;
+    padding: 8px 16px;
+    color: #fff;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    background-image: linear-gradient(to bottom right, #68D391, #4299E1);
+    transition: background-image 0.3s, box-shadow 0.3s;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    font-family: "Dosis", bold;
+    text-align: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.see-owner:hover {
+    background-image: linear-gradient(to bottom left, #8E24AA, #4299E1);
+    box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.1);
+}
+
+.see-owner:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(75, 85, 99, 0.2);
+}
+
+.dark .see-owner:focus {
+    box-shadow: 0 0 0 4px rgba(45, 148, 72, 0.2);
+}
