@@ -82,14 +82,17 @@ def search_recommendation(request):
         return JsonResponse({'recommendations': recs_list})
     else:
         return JsonResponse({'error': 'Metode permintaan tidak valid'}, status=400)
-
+    
+@login_required(login_url='/authentication/login/')
+@csrf_exempt
 def outside_recommendation_add(request):
     form = OutsideRecommendationForm(request.POST or None)
-
-    # if form.is_valid() and request.method == "POST":
-    #     outside_recommendation = form.save(commit=False)
-    #     outside_recommendation.save()
-    #     return HttpResponseRedirect(reverse('recommendation:show_recommendation'))
+    data = {}
+    if form.is_valid():
+        form.save()
+        data['name'] = form.cleaned_data.get('out_book_title')
+        data['another_name'] = form.cleaned_data.get('another_out_book_title')
+        return JsonResponse(data)
 
     context = {'form': form, 'name': request.user.username}
     return render(request, "out_recommendation_add.html", context)

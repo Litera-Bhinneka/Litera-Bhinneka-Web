@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'exchange',
     'crispy_forms',
     'widget_tweaks',
+    "crispy_tailwind",
 ]
 
 MIDDLEWARE = [
@@ -122,7 +123,9 @@ USE_I18N = True
 USE_TZ = True
 
 #crispy
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
