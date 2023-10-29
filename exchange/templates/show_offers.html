@@ -40,7 +40,18 @@
                     {% endfor %}
                 </div>
             </div>
-            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Delete</button>
+            {% if offer.meet %}
+            <div class="meet-details bg-white p-4 rounded shadow-md">
+                <h5>Scheduled a Meeting</h5>
+                <h6 class="text-lg font-semibold">Date:</h6>
+                <p class="text-gray-800">{{ offer.meet.date }}</p>
+                <h6 class="text-lg font-semibold">Location:</h6>
+                <p class="text-gray-800">{{ offer.meet.location }}</p>
+                <h6 class="text-lg font-semibold">Message:</h6>
+                <p class="text-gray-800">{{ offer.meet.message }}</p>
+            </div>
+            {% endif %}
+            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Delete</button>
         </li>
         {% empty %}
         <li class="text-gray-600">
@@ -77,7 +88,18 @@
                     {% endfor %}
                 </div>
             </div>
-            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Cancel</button>
+            {% if offer.meet %}
+            <div class="meet-details bg-white p-4 rounded shadow-md">
+                <h5>Scheduled a Meeting</h5>
+                <h6 class="text-lg font-semibold">Date:</h6>
+                <p class="text-gray-800">{{ offer.meet.date }}</p>
+                <h6 class="text-lg font-semibold">Location:</h6>
+                <p class="text-gray-800">{{ offer.meet.location }}</p>
+                <h6 class="text-lg font-semibold">Message:</h6>
+                <p class="text-gray-800">{{ offer.meet.message }}</p>
+            </div>
+            {% endif %}
+            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Cancel</button>
         </li>
         {% empty %}
         <li class="text-gray-600">
@@ -114,9 +136,20 @@
                     {% endfor %}
                 </div>
             </div>
+            {% if offer.meet %}
+            <div class="meet-details bg-white p-4 rounded shadow-md">
+                <h5>Scheduled a Meeting</h5>
+                <h6 class="text-lg font-semibold">Date:</h6>
+                <p class="text-gray-800">{{ offer.meet.date }}</p>
+                <h6 class="text-lg font-semibold">Location:</h6>
+                <p class="text-gray-800">{{ offer.meet.location }}</p>
+                <h6 class="text-lg font-semibold">Message:</h6>
+                <p class="text-gray-800">{{ offer.meet.message }}</p>
+            </div>
+            {% endif %}
             <div>
-                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" data-offer-id="{{ offer.id }}" id = "accept">Accept</button>
-                <button class="bg-red-500 text-white px-4 py-2 ml-4 rounded hover:bg-red-700" data-offer-id="{{ offer.id }}" id="delete">Reject</button>
+                <button class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700" onclick="sendRequest(this.getAttribute('data-offer-id'), true)" data-offer-id="{{ offer.id }}" id = "accept">Accept</button>
+                <button class="bg-red-500 text-white px-4 py-2 ml-4 rounded hover:bg-red-700" onclick="sendRequest(this.getAttribute('data-offer-id'), false)" data-offer-id="{{ offer.id }}" id="delete">Reject</button>
             </div>
         </li>
         {% empty %}
@@ -151,60 +184,44 @@
             location.reload();
         }
 
-        function sendAcceptRequest(offerId) {
-            $.ajax({
-                url: "/exchange/accept-offer/" + offerId + "/",
-                type: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                },
-                success: function(response) {
-                    if (response.message) {
-                        openModalPrompt(response.message);
-                    } else {
-                        openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
-                    }
-                },
-                error: function() {
-                    openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
-                },
-            });
-        }
-
-        $("#accept").click(function() {
-            var offerId = $(this).data("offer-id");
-            sendAcceptRequest(offerId);
-        });
-
-        $("#delete").click(function() {
-            // Retrieve the offer ID from the data attribute
-            var offerId = $(this).data("offer-id");
-            
-            // Send an AJAX request to the server to cancel the offer
-            $.ajax({
-                url: "/exchange/delete-offer/" + offerId + "/",  // Replace with your actual URL
-                type: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,  // Include the CSRF token in the request headers
-                },
-                success: function(response) {
-                    if (response.message) {
-                        openModalPrompt(response.message);
-                    } else {
-                        openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
-                    }
-                },
-                error: function() {
-                    openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
-                },
-            });
-        });
-
         // Close the modal prompt when the close button is clicked
         $("#modalPromptClose").click(function() {
             closeModalPrompt();
         });
     });
+
+    function openModalPrompt(message) {
+        $("#modalPromptMessage").text(message);
+        $("#modalPrompt").removeClass("hidden");
+    }
+
+    function sendRequest(offerId, accept) {
+        let url;
+        console.log("sendRequest called");
+        if (accept) {
+            url = `/exchange/accept-offer/${offerId}/`;
+        } else {
+            url = `/exchange/delete-offer/${offerId}/`;
+        }
+        const headers = {
+            "X-CSRFToken": csrfToken,
+        };
+        fetch(url, {
+                method: "POST",
+                headers: headers,
+            })
+            .then((response) => response.json())
+            .then(function (response) {
+                if (response.message) {
+                    openModalPrompt(response.message);
+                } else {
+                    openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+                }
+                })
+            .catch(function () {
+                openModalPrompt("An error has occurred while exchanging. Please make a new Offer");
+            });
+    }
 
 </script>
 {% endblock content %}
