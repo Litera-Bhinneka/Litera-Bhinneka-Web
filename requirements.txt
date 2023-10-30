@@ -9,3 +9,4 @@ django-crispy-forms
 crispy-tailwind
 django-guest-user
 django-environ
+whitenoise
