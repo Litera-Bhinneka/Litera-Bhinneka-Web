@@ -18,10 +18,8 @@ class OfferModelTest(TestCase):
             author="Sample Author",
             category="Sample Category",
             image_link="http://sample.com/image.jpg",
-            info_link="http://sample.com/info.html",
             publisher="Sample Publisher",
             description="Sample Description",
-            preview_link="http://sample.com/preview.html",
             year_of_published=2023,
         )
         inventory1 = Inventory.objects.create(user=user1, book=book, amount=10)
@@ -49,10 +47,8 @@ class MeetModelTest(TestCase):
             author="Sample Author",
             category="Sample Category",
             image_link="http://sample.com/image.jpg",
-            info_link="http://sample.com/info.html",
             publisher="Sample Publisher",
             description="Sample Description",
-            preview_link="http://sample.com/preview.html",
             year_of_published=2023,
         )
         inventory1 = Inventory.objects.create(user=user1, book=book, amount=10)
@@ -89,10 +85,8 @@ class OfferUserViewTest(TestCase):
             author="Sample Author",
             category="Sample Category",
             image_link="http://sample.com/image.jpg",
-            info_link="http://sample.com/info.html",
             publisher="Sample Publisher",
             description="Sample Description",
-            preview_link="http://sample.com/preview.html",
             year_of_published=2023,
         )
         inventory1 = Inventory.objects.create(user=user1, book=book, amount=10)
@@ -115,10 +109,8 @@ class ShowBooksViewTest(TestCase):
                         author="New Sample Author",
                         category="New Sample Category",
                         image_link="http://newsample.com/image.jpg",
-                        info_link="http://newsample.com/info.html",
                         publisher="New Sample Publisher",
                         description="New Sample Description",
-                        preview_link="http://newsample.com/preview.html",
                         year_of_published=2024,
                     )
         self.book2 = Book.objects.create(
@@ -127,10 +119,8 @@ class ShowBooksViewTest(TestCase):
                         author="New Sample Author",
                         category="New Sample Category",
                         image_link="http://newsample.com/image.jpg",
-                        info_link="http://newsample.com/info.html",
                         publisher="New Sample Publisher",
                         description="New Sample Description",
-                        preview_link="http://newsample.com/preview.html",
                         year_of_published=2024,
                     )
         self.book3 = Book.objects.create(
@@ -139,10 +129,8 @@ class ShowBooksViewTest(TestCase):
                         author="New Sample Author",
                         category="New Sample Category",
                         image_link="http://newsample.com/image.jpg",
-                        info_link="http://newsample.com/info.html",
                         publisher="New Sample Publisher",
                         description="New Sample Description",
-                        preview_link="http://newsample.com/preview.html",
                         year_of_published=2024,
                     )
 
@@ -177,10 +165,8 @@ class OfferUserViewTest(TestCase):
             author="Sample Author",
             category="Sample Category",
             image_link="http://sample.com/image.jpg",
-            info_link="http://sample.com/info.html",
             publisher="Sample Publisher",
             description="Sample Description",
-            preview_link="http://sample.com/preview.html",
             year_of_published=2023,
         )
         inventory1 = Inventory.objects.create(user=user1, book=book, amount=10)
