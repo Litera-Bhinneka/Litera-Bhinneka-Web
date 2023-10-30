@@ -7,9 +7,7 @@ class Book(models.Model):
     author = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
     image_link = models.URLField()
-    info_link = models.URLField()
     publisher = models.CharField(max_length=255)
     description = models.TextField()
-    preview_link = models.URLField()
     year_of_published = models.IntegerField()
 

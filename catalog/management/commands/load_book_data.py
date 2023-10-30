@@ -35,9 +35,7 @@ class Command(BaseCommand):
                         author = row['author'],
                         category = row['category'],
                         image_link = row['image_link'],
-                        info_link = row['info_link'],
                         publisher = row['publisher'],
                         description = row['description'],
-                        preview_link = row['preview_link'],
                         year_of_published = row['published_date'])  
             book.save()

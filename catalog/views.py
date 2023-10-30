@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from catalog.models import Book
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
+from django.http import HttpResponseNotFound, JsonResponse
 from django.http import HttpResponse
 from django.core import serializers
 from django.db.models import Q

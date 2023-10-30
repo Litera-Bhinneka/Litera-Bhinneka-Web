@@ -2,7 +2,7 @@
 Aplikasi pertukaran buku berbasis website dengan fitur daftar katalog buku, review buku, permintaan pertukaran buku secara online, rekomendasi buku, dan informasi pengguna. 
 
 # Link
-Link to Website: [LINK](http://litera-b06-tk-tutorial.pbp.cs.ui.ac.id)
+Link to Website: [LINK](http://litera-b06-tk.pbp.cs.ui.ac.id)
 
 ## Anggota Kelompok👥
 - Andhika Reihan Hervito (2206826324)

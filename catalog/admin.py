@@ -5,5 +5,5 @@ from catalog.models import Book
 @admin.register(Book)
 class bookAdmin(admin.ModelAdmin):
    list_display=['title', 'rating', 'author', 'category', 
-                 'image_link', 'info_link', 'publisher', 
-                 'description', 'preview_link', 'year_of_published']
+                 'image_link', 'publisher', 
+                 'description', 'year_of_published']
