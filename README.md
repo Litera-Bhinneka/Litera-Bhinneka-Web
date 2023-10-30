@@ -1,3 +1,5 @@
+[![Deploy](https://github.com/Litera-Bhinneka/litera-web/actions/workflows/pbp-deploy.yml/badge.svg?branch=main)](https://github.com/Litera-Bhinneka/litera-web/actions/workflows/pbp-deploy.yml)
+
 # Litera - Web
 Aplikasi pertukaran buku berbasis website dengan fitur daftar katalog buku, review buku, permintaan pertukaran buku secara online, rekomendasi buku, dan informasi pengguna. 
 
