@@ -26,5 +26,5 @@ urlpatterns = [
     path('recommendation/', include('recommendation.urls')),
     path('exchange/', include('exchange.urls')),
     path('manage-user/', include('manage_user.urls')),
-
+    path('auth/', include('auth_flutter.urls')),
 ]
