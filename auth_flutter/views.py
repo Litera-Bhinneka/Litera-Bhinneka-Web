@@ -15,6 +15,7 @@ def login(request):
             auth_login(request, user)
             # Redirect to a success page.
             return JsonResponse({
+              "username": user.username,
               "status": True,
               "message": "Successfully Logged In!"
               # Insert any extra data if you want to pass data to Flutter
