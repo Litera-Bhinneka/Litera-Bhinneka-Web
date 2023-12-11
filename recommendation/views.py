@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from .models import OutsideRecommendation, Recommendation
 from catalog.models import Book
@@ -115,6 +116,29 @@ def outside_recommendation_add(request):
         context = {'form': form, 'name': request.user.username}
         return render(request, "out_recommendation_add.html", context)
 
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        
+        data = json.loads(request.body)
+        new_product = Recommendation.objects.create(
+            recommender_name = data["recommender_name"],
+            book_title = data["book_title"],
+            another_book_title = data["another_book_title"],
+            book_id = get_id(request, data["book_title"]),
+            another_book_id = get_id(request, data["another_book_title"]),
+            book_image = get_image(request, data["book_title"]),
+            another_book_image = get_image(request, data["another_book_title"]),
+            recommendation_scale = 0,
+            description = data["description"],
+        )
+
+        new_product.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+    
 def get_user_inventory_json(request):
     user = request.user
     inventory = Inventory.objects.filter(user=user)
@@ -122,6 +146,18 @@ def get_user_inventory_json(request):
     for i in inventory:
         book_title.append(i.book.title)
     return JsonResponse({'book_titles': book_title})
+
+def get_id(request, title):
+    inventory = Book.objects.filter(title=title)
+    for i in inventory:
+        return i.id
+    return 0
+
+def get_image(request, book_title):
+    inventory = Book.objects.filter(title=book_title)
+    for i in inventory:
+        return i.image_link
+    return "0"
 
 def get_book_image(request):
     user = request.user
