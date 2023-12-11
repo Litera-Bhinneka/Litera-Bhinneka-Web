@@ -1,8 +1,9 @@
+import json
 from django.shortcuts import render, get_object_or_404
 from review.models import Review
 from catalog.models import Book
 from manage_user.models import Wishlist
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, JsonResponse
 from review.forms import ReviewForm
 from django.urls import reverse
 from django.core import serializers
@@ -67,9 +68,9 @@ def get_wishlist_json(request, book_id):
 
 @csrf_exempt
 def add_review_ajax(request, book_id1, book_id2):
+    print(f"ini request {request}")
+    print(request.POST)
     if request.method == 'POST':
-        print(request.POST)
-        print(request.POST.get("rating"))
         review_text = request.POST.get("review_text")
         review_summary = request.POST.get("review_summary")
         reviewer_name = request.user.username
@@ -87,3 +88,37 @@ def add_review_ajax(request, book_id1, book_id2):
     print(request.method)
 
     return HttpResponseNotFound()
+
+
+@csrf_exempt
+def add_review_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        new_review = Review(book_title=data["book_title"],
+                             reviewer_name=data["reviewer_name"], 
+                             review_score=data["review_score"],
+                             review_summary=data["review_summary"],
+                             review_text=data["review_text"])
+        new_review.save()
+
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+    # if request.method == 'POST':
+    #     review_text = request.POST.get("review_text")
+    #     review_summary = request.POST.get("review_summary")
+    #     reviewer_name = request.user.username
+    #     rating = int(request.POST.get("review_score"))
+    #     book_title = get_object_or_404(Book, pk=book_id2).title
+
+    #     new_review = Review(book_title=book_title,
+    #                          reviewer_name=reviewer_name, 
+    #                          review_score=rating,
+    #                          review_summary=review_summary,
+    #                          review_text=review_text)
+    #     new_review.save()
+
+    #     return HttpResponse(b"CREATED", status=201)
+    # print(request.method)
+
+    # return HttpResponseNotFound()

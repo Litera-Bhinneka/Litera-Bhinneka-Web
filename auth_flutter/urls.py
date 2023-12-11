@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 from auth_flutter.views import login, logout, register
 
 app_name = 'auth_flutter'
