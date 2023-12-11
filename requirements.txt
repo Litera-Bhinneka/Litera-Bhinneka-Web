@@ -10,4 +10,4 @@ crispy-tailwind
 django-guest-user
 django-environ
 whitenoise
-corsheader
+django-cors-headers
