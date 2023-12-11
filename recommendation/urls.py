@@ -1,5 +1,5 @@
 from django.urls import path
-from recommendation.views import show_main, show_recommendation, add_recommendation, get_recommendation_json, add_recommendation_ajax, get_user_inventory_json, get_book_image, add_recommendation_ajax, get_book_ids, search_recommendation, show_out_recommendation, outside_recommendation_add, get_out_recommendation_json, search_out_recommendation
+from recommendation.views import create_product_flutter, show_main, show_recommendation, add_recommendation, get_recommendation_json, add_recommendation_ajax, get_user_inventory_json, get_book_image, add_recommendation_ajax, get_book_ids, search_recommendation, show_out_recommendation, outside_recommendation_add, get_out_recommendation_json, search_out_recommendation
 app_name = 'recommendation'
 
 urlpatterns = [
@@ -17,4 +17,5 @@ urlpatterns = [
     path('outside-recommendation-add/', outside_recommendation_add, name='outside_recommendation_add'),
     path('get-out-recommendation-json/', get_out_recommendation_json, name='get_out_recommendation_json'),
     path('search-out-recommendation/', search_out_recommendation, name='search_out_recommendation'),
+    path('create-flutter/', create_product_flutter, name='create_product_flutter'),
 ]
