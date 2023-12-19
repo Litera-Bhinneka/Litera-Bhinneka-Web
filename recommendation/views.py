@@ -11,6 +11,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.contrib.auth.models import User
 
 # Create your views here.
 def show_main(request):
@@ -141,6 +142,14 @@ def create_product_flutter(request):
     
 def get_user_inventory_json(request):
     user = request.user
+    inventory = Inventory.objects.filter(user=user)
+    book_title = []
+    for i in inventory:
+        book_title.append(i.book.title)
+    return JsonResponse({'book_titles': book_title})
+
+def get_user_inventory_flutter(request, username):
+    user = User.objects.get(username=username)
     inventory = Inventory.objects.filter(user=user)
     book_title = []
     for i in inventory:
