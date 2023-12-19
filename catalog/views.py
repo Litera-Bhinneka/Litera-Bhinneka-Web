@@ -8,6 +8,10 @@ from django.db.models import Q
 from review.management.commands.load_rating_data import Command
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import BookEditForm
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from catalog.models import Book
 
 
 # Create your views here.
@@ -76,3 +80,31 @@ def edit_book(request, id):
 
     context = {'form': form, 'name': request.user.username,}
     return render(request, "edit_book.html", context)
+
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+            data = json.loads(request.body)
+
+            #year_of_published = data.get("year_of_published", data.get("yearOfPublished"))
+
+            # Cek apakah buku dengan judul yang sama sudah ada
+            if Book.objects.filter(title=data["title"]).exists():
+                return JsonResponse({"status": "error", "error_message": "Buku dengan judul yang sama sudah ada."}, status=400)
+
+            # Pastikan model Book sesuai dengan model yang digunakan
+            new_product = Book.objects.create(
+                image_link=data.get("imageLink"),
+                title=data["title"],
+                description=data["description"],
+                author=data["author"],
+                category=data["category"],
+                year_of_published = int(data.get("yearOfPublished")),
+                rating=0
+            )
+
+            new_product.save()
+
+            return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)

@@ -1,6 +1,6 @@
 from django.urls import path
 from catalog.views import show_catalog
-from catalog.views import get_product_json, add_product_ajax, search_books, edit_book
+from catalog.views import get_product_json, add_product_ajax, search_books, edit_book, create_product_flutter
 app_name = 'catalog'
 
 urlpatterns = [
@@ -8,6 +8,6 @@ urlpatterns = [
   path('get-product/', get_product_json, name='get_product_json'),
   path('create-product-ajax/', add_product_ajax, name='add_product_ajax'),
   path('search-books/', search_books, name='search_books'),
-  path('show-catalog/edit-book/<int:id>/', edit_book, name='edit_book')
-  
+  path('show-catalog/edit-book/<int:id>/', edit_book, name='edit_book'),
+  path('create-flutter/', create_product_flutter, name='create_product_flutter'),
 ]
