@@ -139,6 +139,15 @@ def create_product_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def delete_object(request, object_id):
+    try:
+        obj = Recommendation.objects.get(pk=object_id)
+        obj.delete()
+        return JsonResponse({'message': 'Object deleted successfully'})
+    except Recommendation.DoesNotExist:
+        return JsonResponse({'error': 'Object not found'}, status=404)
     
 def get_user_inventory_json(request):
     user = request.user
