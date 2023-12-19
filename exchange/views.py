@@ -220,6 +220,10 @@ def get_owners_flutter(request, id, username):
 
 @csrf_exempt
 def get_offers_flutter(request, username):
+    user = User.objects.get(username=username)
+    if (user.is_superuser):
+        return HttpResponse(json.dumps({'sent:': [], 'received': json.loads(serializers.serialize('json', Offer.objects.all(), fields=('Username1, Username2')))}), content_type='application/json')
+    
     offers_sent = Offer.objects.filter(Username2=username)
     offers_sent_json = serializers.serialize('json', offers_sent, fields=('Username1, Username2'))
     offers_received = Offer.objects.filter(Username1=username)
