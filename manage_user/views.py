@@ -107,10 +107,16 @@ def show_wishlist(request):
     user = request.user
 
     # Fetch the wishlist data for the logged-in user
-    wishlist_books = Wishlist.objects.filter(user=user).values('book')
-    books = Book.objects.filter(pk__in=wishlist_books)
+    wishlist_items = Wishlist.objects.filter(user=user)
+    
+    wishlist_data = []
 
-    wishlist_data = [{'title': book.title, 'image_link': book.image_link} for book in books]
+    for item in wishlist_items:
+        wishlist_data.append({
+            'id': item.book.id,
+            'title': item.book.title,
+            'image_link': item.book.image_link,
+        })
 
     context = {
         'wishlist_data': wishlist_data,  # Pass the wishlist data to the template
@@ -137,3 +143,60 @@ def show_inventory(request):
     return render(request, "show_inventory.html", context)
 
 
+@login_required(login_url='/authentication/login/')
+def add_to_inventory_flutter(request, book_id):
+    if request.method == "POST":
+        book = get_object_or_404(Book, pk=book_id)
+        user = request.user
+
+        # Check if the book is already in the user's inventory
+        inventory = Inventory.objects.filter(user=user, book=book).first()
+
+        if inventory is None:
+            # If not in inventory, create a new inventory entry
+            inventory = Inventory(user=user, book=book, amount=1)
+        else:
+            # If already in inventory, increment the quantity
+            inventory.amount += 1
+
+        inventory.save()
+        # You can return a JSON response or any other data suitable for Flutter
+        return JsonResponse({'status': 'OK'}, status=201)
+
+    # You should handle other HTTP methods or invalid requests accordingly
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required(login_url='/authentication/login/')
+def show_inventory_flutter(request):
+    user = request.user
+    inventory_books = Inventory.objects.filter(user=user)
+    inventory_data = [{'title': book.book.title, 'amount': book.amount} for book in inventory_books]
+
+    # You can return a JSON response or any other data suitable for Flutter
+    return JsonResponse({'inventory_data': inventory_data, 'name': request.user.username})
+
+@login_required(login_url='/authentication/login/')
+def add_to_wishlist_flutter(request, book_id):
+    if request.method == "POST":
+        book = get_object_or_404(Book, pk=book_id)
+        user = request.user
+        new_wishlist = Wishlist(user=user, book=book)
+        new_wishlist.save()
+        # You can return a JSON response or any other data suitable for Flutter
+        return JsonResponse({'status': 'CREATED'}, status=201)
+
+    # You should handle other HTTP methods or invalid requests accordingly
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required(login_url='/authentication/login/')
+def show_wishlist_flutter(request):
+    user = request.user
+
+    # Fetch the wishlist data for the logged-in user
+    wishlist_books = Wishlist.objects.filter(user=user).values('book')
+    books = Book.objects.filter(pk__in=wishlist_books)
+
+    wishlist_data = [{'title': book.title, 'image_link': book.image_link} for book in books]
+
+    # You can return a JSON response or any other data suitable for Flutter
+    return JsonResponse({'wishlist_data': wishlist_data, 'name': request.user.username})
