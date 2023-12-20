@@ -104,21 +104,13 @@ def add_review_flutter(request):
         return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
-    # if request.method == 'POST':
-    #     review_text = request.POST.get("review_text")
-    #     review_summary = request.POST.get("review_summary")
-    #     reviewer_name = request.user.username
-    #     rating = int(request.POST.get("review_score"))
-    #     book_title = get_object_or_404(Book, pk=book_id2).title
+    
 
-    #     new_review = Review(book_title=book_title,
-    #                          reviewer_name=reviewer_name, 
-    #                          review_score=rating,
-    #                          review_summary=review_summary,
-    #                          review_text=review_text)
-    #     new_review.save()
-
-    #     return HttpResponse(b"CREATED", status=201)
-    # print(request.method)
-
-    # return HttpResponseNotFound()
+@csrf_exempt
+def delete_object(request, object_id):
+    try:
+        obj = Review.objects.get(pk=object_id)
+        obj.delete()
+        return JsonResponse({'message': 'Object deleted successfully'})
+    except Review.DoesNotExist:
+        return JsonResponse({'error': 'Object not found'}, status=404)
