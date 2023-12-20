@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from catalog.models import Book
 
 
+
 # Create your views here.
 def show_catalog(request):
     books = Book.objects.all().values()
@@ -106,5 +107,71 @@ def create_product_flutter(request):
             new_product.save()
 
             return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+@csrf_exempt
+def edit_product_flutter(request, id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        # Dapatkan produk berdasarkan ID
+        product = Book.objects.get(pk=id)
+
+        # Lakukan penyuntingan berdasarkan data yang diterima
+        product.image_link = data.get("imageLink", product.image_link)
+        product.title = data.get("title", product.title)
+        product.author = data.get("author", product.author)
+        product.year_of_published = int(data.get("yearOfPublished", product.year_of_published))
+        product.description = data.get("description", product.description)
+        product.category = data.get("category", product.category)
+
+        # Simpan perubahan
+        product.save()
+
+        # Kirim detail buku yang diperbarui ke Flutter
+        book_data = {
+            'title': product.title,
+            'imageLink': product.image_link,
+            'author': product.author,
+            'yearOfPublished': product.year_of_published,
+            'description': product.description,
+            'category': product.category,
+        }
+        return JsonResponse({"status": "success", "bookData": book_data}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
+
+
+
+# def get_product_by_id(request, product_id):
+#     product = get_object_or_404(Book, pk=product_id)
+#     return JsonResponse({'product_id': product.pk, 'title': product.title, 'author': product.author})
+def get_product_by_id(request, product_id):
+    product = get_object_or_404(Book, pk=product_id)
+
+    # Mengambil informasi yang diinginkan dari objek Book
+    response_data = {
+        'product_id': product.pk,
+        'imageLink': product.image_link,
+        'title': product.title,
+        'author': product.author,
+        'category': product.category,
+        'yearOfPublished': product.year_of_published,
+        'description': product.description,
+    }
+
+    return JsonResponse(response_data)
+
+@csrf_exempt
+def delete_product_flutter(request, id):
+    if request.method == 'DELETE':
+        # Dapatkan produk berdasarkan ID
+        product = get_object_or_404(Book, pk=id)
+
+        # Hapus produk
+        product.delete()
+
+        return JsonResponse({"status": "success"}, status=200)
     else:
         return JsonResponse({"status": "error"}, status=401)
